@@ -840,12 +840,10 @@
                 let row = 0;
                 let placedCount = 0;
 
-                // Find available column (check for collision)
                 while (currentCol < COLS && usedPositions.has(`0,${currentCol}`)) {
                     currentCol++;
                 }
 
-                // Place streak vertically first
                 for (let i = 0; i < streak.length && row < ROWS; i++) {
                     const pos = `${row},${currentCol}`;
                     if (!usedPositions.has(pos)) {
@@ -859,9 +857,7 @@
                             let nextRow = Math.max(0, row - 1);
                             let nextCol = currentCol + 1;
                             
-                            // Place remaining results horizontally at the row before collision
                             for (let j = i; j < streak.length; j++) {
-                                // Find next available column
                                 while (nextCol < COLS && usedPositions.has(`${nextRow},${nextCol}`)) {
                                     nextCol++;
                                 }
@@ -874,19 +870,16 @@
                                 }
                             }
                         }
-                        break; // Exit the vertical placement loop
+                        break;
                     }
                 }
 
                 // If we filled the column (no collision, just exceeded 6 rows) and streak is long enough
                 if (placedCount < streak.length && row >= ROWS && streak.length >= 7) {
-                    // Start horizontal placement at bottom row (row 5)
                     let nextRow = ROWS - 1;
                     let nextCol = currentCol + 1;
                     
-                    // Place remaining results horizontally at bottom row
                     for (let i = placedCount; i < streak.length; i++) {
-                        // Find next available column
                         while (nextCol < COLS && usedPositions.has(`${nextRow},${nextCol}`)) {
                             nextCol++;
                         }
@@ -927,14 +920,11 @@
 
         // Add tie markers to the appropriate cells
         function addTieMarkers() {
-            // Create a list of all non-tie cell positions in the order they appear in the game
             const cellPositions = [];
             
-            // Rebuild the cell positions following the same logic as updateBigRoad
             const nonTieResults = gameHistory.filter(r => r !== 'T');
             if (nonTieResults.length === 0) return;
 
-            // Group into streaks
             const streaks = [];
             let currentStreak = [nonTieResults[0]];
             
@@ -950,7 +940,6 @@
                 streaks.push(currentStreak);
             }
 
-            // Track positions exactly like in updateBigRoad
             let currentCol = 0;
             const usedPositions = new Set();
 
@@ -959,12 +948,10 @@
                 let row = 0;
                 let placedCount = 0;
 
-                // Find available column (check for collision)
                 while (currentCol < COLS && usedPositions.has(`0,${currentCol}`)) {
                     currentCol++;
                 }
 
-                // Place streak vertically first
                 for (let i = 0; i < streak.length && row < ROWS; i++) {
                     const pos = `${row},${currentCol}`;
                     if (!usedPositions.has(pos)) {
@@ -978,9 +965,7 @@
                             let dragonRow = Math.max(0, row - 1);
                             let dragonCol = currentCol + 1;
                             
-                            // Place remaining results horizontally at the row before collision
                             for (let j = i; j < streak.length; j++) {
-                                // Find next available column
                                 while (nextCol < COLS && usedPositions.has(`${nextRow},${nextCol}`)) {
                                     nextCol++;
                                 }
@@ -992,19 +977,16 @@
                                 }
                             }
                         }
-                        break; // Exit the vertical placement loop
+                        break;
                     }
                 }
 
                 // If we filled the column (no collision, just exceeded 6 rows) and streak is long enough
                 if (placedCount < streak.length && row >= ROWS && streak.length >= 7) {
-                    // Start horizontal placement at bottom row (row 5)
                     let nextRow = ROWS - 1;
                     let nextCol = currentCol + 1;
                     
-                    // Place remaining results horizontally at bottom row
                     for (let i = placedCount; i < streak.length; i++) {
-                        // Find next available column
                         while (nextCol < COLS && usedPositions.has(`${nextRow},${nextCol}`)) {
                             nextCol++;
                         }
@@ -1017,50 +999,37 @@
                     }
                 }
 
-                // Move to next column for next streak
                 currentCol++;
             });
 
-            // Now apply tie markers using the correct positions
             let nonTieIndex = -1;
             
             gameHistory.forEach((result, gameIndex) => {
                 if (result === 'T') {
-                    // Tie should be placed on the PREVIOUS non-tie hand
                     if (nonTieIndex >= 0 && nonTieIndex < cellPositions.length) {
                         const { row, col } = cellPositions[nonTieIndex];
                         const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
                         if (cell && bigRoadMatrix[row][col]) {
-                            // Check if tie indicator already exists
                             let tieIndicator = cell.querySelector('.tie-indicator');
                             let currentTieCount = 1;
                             
                             if (tieIndicator) {
-                                // Get current count and increment
                                 currentTieCount = parseInt(tieIndicator.textContent) + 1;
                                 tieIndicator.remove();
                             }
                             
-                            // Create new tie indicator with updated count
                             tieIndicator = document.createElement('div');
                             tieIndicator.className = 'tie-indicator';
                             
-                            // Add special styling for multiple ties
                             if (currentTieCount > 1) {
                                 tieIndicator.classList.add('multiple');
                             }
                             
                             tieIndicator.textContent = currentTieCount;
                             cell.appendChild(tieIndicator);
-                            
-                            // Add entrance animation
-                            setTimeout(() => {
-                                // Removed blinking animations for tie indicators
-                            }, 100);
                         }
                     }
                 } else {
-                    // This is a non-tie result, increment the index
                     nonTieIndex++;
                 }
             });
@@ -1069,10 +1038,9 @@
         // Auto scroll to show the latest results
         function autoScrollToLatest() {
             const roadContainer = document.querySelector('.road-grid-container');
-            const gridWidth = COLS * 47; // 45px + 2px gap
+            const gridWidth = COLS * 47;
             const containerWidth = roadContainer.clientWidth;
             
-            // Find the rightmost occupied column
             let lastCol = 0;
             for (let col = COLS - 1; col >= 0; col--) {
                 for (let row = 0; row < ROWS; row++) {
@@ -1084,7 +1052,6 @@
                 if (lastCol > 0) break;
             }
             
-            // Smooth scroll to keep the latest results visible
             if (lastCol * 47 > containerWidth - 200) {
                 roadContainer.scrollTo({
                     left: (lastCol * 47) - containerWidth + 200,
@@ -1123,570 +1090,8 @@
             });
         }
 
-        // ==================== 3D DRAGON SYSTEM ====================
-        
-        // Dragon 3D System State
-        let dragonEffectsEnabled = true;
-        let dragonScenes = new Map(); // Map of cell positions to 3D scenes
-        let dragonModels = new Map(); // Cache loaded models
-        let dragonLoader = null;
-
-        // Initialize Dragon 3D System
-        function initDragon3DSystem() {
-            console.log('🚀 Initializing Dragon 3D System...');
-            console.log('🔍 THREE available:', typeof THREE !== 'undefined');
-            console.log('🔍 THREE.GLTFLoader available:', typeof THREE !== 'undefined' && !!THREE.GLTFLoader);
-            console.log('🔍 window.GLTFLoader available:', typeof window.GLTFLoader !== 'undefined');
-            console.log('🔍 global GLTFLoader available:', typeof GLTFLoader !== 'undefined');
-            
-            // Try multiple ways to get GLTFLoader
-            if (typeof THREE !== 'undefined' && THREE.GLTFLoader) {
-                dragonLoader = new THREE.GLTFLoader();
-                console.log('✅ Dragon 3D System initialized with THREE.GLTFLoader');
-                return;
-            }
-            
-            if (typeof window.GLTFLoader !== 'undefined') {
-                dragonLoader = new window.GLTFLoader();
-                console.log('✅ Dragon 3D System initialized with window.GLTFLoader');
-                return;
-            }
-            
-            if (typeof GLTFLoader !== 'undefined') {
-                dragonLoader = new GLTFLoader();
-                console.log('✅ Dragon 3D System initialized with global GLTFLoader');
-                return;
-            }
-            
-            console.warn('⚠️ No GLTFLoader found - will use fallback dragons only');
-            console.log('🔄 Will retry in 1 second...');
-            
-            // Retry after a short delay (only once)
-            if (!initDragon3DSystem.retried) {
-                initDragon3DSystem.retried = true;
-                setTimeout(() => {
-                    console.log('🔄 Retrying GLTFLoader initialization...');
-                    initDragon3DSystem();
-                }, 1000);
-            }
-        }
-
-        // Toggle Dragon Effects
-        function toggleDragonEffects() {
-            dragonEffectsEnabled = !dragonEffectsEnabled;
-            const toggleBtn = document.getElementById('dragon-toggle');
-            
-            if (dragonEffectsEnabled) {
-                toggleBtn.textContent = '🐉 Dragon Effects: ON';
-                toggleBtn.classList.add('active');
-                updateBigRoad(); // Refresh to show dragons
-            } else {
-                toggleBtn.textContent = '🐉 Dragon Effects: OFF';
-                toggleBtn.classList.remove('active');
-                clearAllDragons();
-            }
-        }
-
-        // Clear All Dragons
-        function clearAllDragons() {
-            dragonScenes.forEach((scene, position) => {
-                const cell = document.querySelector(`[data-row="${position.split(',')[0]}"][data-col="${position.split(',')[1]}"]`);
-                if (cell) {
-                    const container = cell.querySelector('.dragon-canvas-container');
-                    if (container) {
-                        container.remove();
-                    }
-                    cell.classList.remove('dragon-tail-3d');
-                }
-            });
-            dragonScenes.clear();
-        }
-
-        // Create 3D Dragon on Dragon Tail Cell
-        function createDragon3D(cell, position) {
-            console.log(`🐉 createDragon3D called for position: ${position}`);
-            console.log(`🔍 dragonEffectsEnabled: ${dragonEffectsEnabled}`);
-            console.log(`🔍 dragonLoader exists: ${!!dragonLoader}`);
-            
-            if (!dragonEffectsEnabled) {
-                console.log('❌ Dragon effects disabled');
-                return;
-            }
-            
-            // Always create fallback dragon first as backup
-            createFallbackDragon(cell);
-            
-            // Then try to create 3D dragon if loader available
-            if (!dragonLoader) {
-                console.log('❌ Dragon loader not available - trying geometric dragon...');
-                // Try to create geometric dragon instead
-                if (typeof THREE !== 'undefined') {
-                    // Create canvas container
-                    const canvasContainer = document.createElement('div');
-                    canvasContainer.className = 'dragon-canvas-container';
-                    
-                    const canvas = document.createElement('canvas');
-                    canvas.className = 'dragon-canvas';
-                    canvasContainer.appendChild(canvas);
-                    cell.appendChild(canvasContainer);
-
-                    // Setup Three.js scene
-                    const scene = new THREE.Scene();
-                    const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-                    const renderer = new THREE.WebGLRenderer({ 
-                        canvas: canvas, 
-                        alpha: true,
-                        antialias: true 
-                    });
-                    
-                    renderer.setSize(100, 60);
-                    renderer.setClearColor(0x000000, 0);
-                    renderer.shadowMap.enabled = true;
-                    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-                    // Add lighting
-                    const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
-                    scene.add(ambientLight);
-
-                    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-                    directionalLight.position.set(5, 5, 5);
-                    directionalLight.castShadow = true;
-                    scene.add(directionalLight);
-
-                    const rimLight = new THREE.DirectionalLight(0xFFD700, 0.8);
-                    rimLight.position.set(-5, 3, -5);
-                    scene.add(rimLight);
-
-                    // Create geometric dragon
-                    createGeometricDragon(cell, scene, camera, renderer, position);
-                    return;
-                }
-                console.log('❌ Three.js not available - using emoji fallback only');
-                return;
-            }
-
-            // Remove existing dragon
-            const existingContainer = cell.querySelector('.dragon-canvas-container');
-            if (existingContainer) {
-                existingContainer.remove();
-            }
-
-            // Add dragon tail class
-            cell.classList.add('dragon-tail-3d');
-
-            // Create canvas container
-            const canvasContainer = document.createElement('div');
-            canvasContainer.className = 'dragon-canvas-container';
-            
-            const canvas = document.createElement('canvas');
-            canvas.className = 'dragon-canvas';
-            canvasContainer.appendChild(canvas);
-            cell.appendChild(canvasContainer);
-
-            // Setup Three.js scene
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-            const renderer = new THREE.WebGLRenderer({ 
-                canvas: canvas, 
-                alpha: true,
-                antialias: true 
-            });
-            
-            renderer.setSize(100, 60); // Small size for cell
-            renderer.setClearColor(0x000000, 0); // Transparent background
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-            // Lighting
-            const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
-            scene.add(ambientLight);
-
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-            directionalLight.position.set(5, 5, 5);
-            directionalLight.castShadow = true;
-            directionalLight.shadow.mapSize.width = 512;
-            directionalLight.shadow.mapSize.height = 512;
-            scene.add(directionalLight);
-
-            // Add golden rim light for casino effect
-            const rimLight = new THREE.DirectionalLight(0xFFD700, 0.8);
-            rimLight.position.set(-5, 3, -5);
-            scene.add(rimLight);
-
-            // Add point light for dramatic effect
-            const pointLight = new THREE.PointLight(0xFFD700, 1, 10);
-            pointLight.position.set(0, 2, 2);
-            pointLight.castShadow = true;
-            scene.add(pointLight);
-
-            // Add subtle color-changing ambient
-            const colorLight = new THREE.AmbientLight(0x000000, 0.3);
-            scene.add(colorLight);
-
-            // Load Dragon Model
-            console.log('🔄 Starting to load dragon model...');
-            dragonLoader.load('source/low_poly_dragon_white.glb', (gltf) => {
-                console.log('✅ Dragon model loaded successfully!');
-                const dragon = gltf.scene;
-                
-                // Scale and position dragon
-                dragon.scale.set(2, 2, 2);
-                dragon.position.set(0, -0.5, 0);
-                dragon.rotation.y = Math.PI / 4; // Slight angle
-                
-                // Load custom texture
-                const textureLoader = new THREE.TextureLoader();
-                textureLoader.load('textures/gltf_embedded_0.png', (texture) => {
-                    // Configure texture
-                    texture.wrapS = THREE.RepeatWrapping;
-                    texture.wrapT = THREE.RepeatWrapping;
-                    texture.flipY = false;
-                    
-                    // Apply custom material with texture and casino effects
-                    dragon.traverse((child) => {
-                        if (child.isMesh) {
-                            child.castShadow = true;
-                            child.receiveShadow = true;
-                            
-                            // Create premium casino material
-                            const casinoMaterial = new THREE.MeshPhongMaterial({
-                                map: texture,
-                                color: 0xFFD700, // Golden tint
-                                emissive: 0x442200, // Warm golden glow
-                                emissiveIntensity: 0.2,
-                                shininess: 100,
-                                specular: 0xFFD700, // Golden reflections
-                                transparent: true,
-                                opacity: 0.95
-                            });
-                            
-                            child.material = casinoMaterial;
-                        }
-                    });
-                    
-                    console.log('🎨 Dragon texture loaded successfully');
-                }, undefined, (error) => {
-                    console.warn('⚠️ Could not load dragon texture, using default material');
-                    // Fallback to default material with golden effects
-                    dragon.traverse((child) => {
-                        if (child.isMesh) {
-                            child.castShadow = true;
-                            child.receiveShadow = true;
-                            
-                            if (child.material) {
-                                child.material.emissive = new THREE.Color(0x333300);
-                                child.material.emissiveIntensity = 0.1;
-                                child.material.color = new THREE.Color(0xFFD700);
-                            }
-                        }
-                    });
-                });
-
-                scene.add(dragon);
-
-                // Add magical particles around dragon
-                const particleGeometry = new THREE.BufferGeometry();
-                const particleCount = 20;
-                const positions = new Float32Array(particleCount * 3);
-                const velocities = new Float32Array(particleCount * 3);
-                
-                for (let i = 0; i < particleCount; i++) {
-                    positions[i * 3] = (Math.random() - 0.5) * 4;
-                    positions[i * 3 + 1] = (Math.random() - 0.5) * 2;
-                    positions[i * 3 + 2] = (Math.random() - 0.5) * 4;
-                    
-                    velocities[i * 3] = (Math.random() - 0.5) * 0.01;
-                    velocities[i * 3 + 1] = Math.random() * 0.02;
-                    velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.01;
-                }
-                
-                particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-                
-                const particleMaterial = new THREE.PointsMaterial({
-                    color: 0xFFD700,
-                    size: 0.05,
-                    transparent: true,
-                    opacity: 0.6,
-                    blending: THREE.AdditiveBlending
-                });
-                
-                const particles = new THREE.Points(particleGeometry, particleMaterial);
-                scene.add(particles);
-
-                // Camera position
-                camera.position.set(2, 1, 3);
-                camera.lookAt(0, 0, 0);
-
-                // Animation loop
-                let animationId;
-                let time = 0;
-                function animate() {
-                    animationId = requestAnimationFrame(animate);
-                    time += 0.016; // ~60fps
-                    
-                    // Gentle floating animation
-                    dragon.position.y = -0.5 + Math.sin(time * 3) * 0.1;
-                    dragon.rotation.y += 0.005; // Slow rotation
-                    
-                    // Breathing effect
-                    const scale = 2 + Math.sin(time * 2) * 0.05;
-                    dragon.scale.set(scale, scale, scale);
-                    
-                    // Animate particles
-                    const positions = particles.geometry.attributes.position.array;
-                    for (let i = 0; i < particleCount; i++) {
-                        positions[i * 3] += velocities[i * 3];
-                        positions[i * 3 + 1] += velocities[i * 3 + 1];
-                        positions[i * 3 + 2] += velocities[i * 3 + 2];
-                        
-                        // Reset particles that go too far
-                        if (positions[i * 3 + 1] > 3) {
-                            positions[i * 3] = (Math.random() - 0.5) * 4;
-                            positions[i * 3 + 1] = -1;
-                            positions[i * 3 + 2] = (Math.random() - 0.5) * 4;
-                        }
-                    }
-                    particles.geometry.attributes.position.needsUpdate = true;
-                    
-                    // Rotate particles around dragon
-                    particles.rotation.y += 0.01;
-                    
-                    // Dynamic lighting effects
-                    pointLight.intensity = 1 + Math.sin(time * 4) * 0.3;
-                    pointLight.position.x = Math.sin(time * 2) * 1;
-                    
-                    // Color-changing ambient light (subtle casino colors)
-                    const hue = (time * 0.1) % 1;
-                    const color = new THREE.Color().setHSL(hue, 0.3, 0.2);
-                    colorLight.color = color;
-                    
-                    // Rim light pulsing
-                    rimLight.intensity = 0.8 + Math.sin(time * 5) * 0.2;
-                    
-                    renderer.render(scene, camera);
-                }
-                animate();
-
-                // Store scene for cleanup
-                dragonScenes.set(position, { scene, renderer, animationId, dragon, particles, velocities });
-
-                // Add entrance effect
-                dragon.scale.set(0, 0, 0);
-                const entranceAnimation = () => {
-                    const targetScale = 2;
-                    const currentScale = dragon.scale.x;
-                    if (currentScale < targetScale) {
-                        const newScale = currentScale + 0.1;
-                        dragon.scale.set(newScale, newScale, newScale);
-                        requestAnimationFrame(entranceAnimation);
-                    }
-                };
-                setTimeout(entranceAnimation, 100);
-
-            }, undefined, (error) => {
-                console.error('❌ Error loading dragon model:', error);
-                console.log('🔄 Trying geometric dragon fallback...');
-                // Try geometric dragon fallback first
-                createGeometricDragon(cell, scene, camera, renderer, position);
-            });
-        }
-
-        // Create geometric 3D dragon if GLB model fails
-        function createGeometricDragon(cell, scene, camera, renderer, position) {
-            console.log('🔶 Creating geometric dragon...');
-            
-            try {
-                // Create dragon body (elongated sphere)
-                const bodyGeometry = new THREE.SphereGeometry(0.3, 8, 6);
-                const bodyMaterial = new THREE.MeshPhongMaterial({ 
-                    color: 0xFFD700, 
-                    emissive: 0x331100,
-                    emissiveIntensity: 0.2,
-                    shininess: 100 
-                });
-                const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-                body.scale.set(1, 0.7, 2); // Elongated
-                
-                // Create dragon head
-                const headGeometry = new THREE.SphereGeometry(0.2, 8, 6);
-                const head = new THREE.Mesh(headGeometry, bodyMaterial);
-                head.position.set(0, 0.1, 0.6);
-                head.scale.set(1.2, 1, 1.2);
-                
-                // Create dragon tail segments
-                const tailSegments = [];
-                for (let i = 0; i < 3; i++) {
-                    const segmentGeometry = new THREE.SphereGeometry(0.15 - i * 0.03, 6, 4);
-                    const segment = new THREE.Mesh(segmentGeometry, bodyMaterial);
-                    segment.position.set(0, -i * 0.05, -0.4 - i * 0.3);
-                    segment.scale.set(0.8 - i * 0.1, 0.8 - i * 0.1, 1);
-                    tailSegments.push(segment);
-                }
-                
-                // Create wings
-                const wingGeometry = new THREE.ConeGeometry(0.3, 0.6, 4);
-                const wingMaterial = new THREE.MeshPhongMaterial({ 
-                    color: 0xFFA500,
-                    transparent: true,
-                    opacity: 0.8,
-                    emissive: 0x221100,
-                    emissiveIntensity: 0.1 
-                });
-                
-                const leftWing = new THREE.Mesh(wingGeometry, wingMaterial);
-                leftWing.position.set(-0.4, 0.2, 0.2);
-                leftWing.rotation.z = -Math.PI / 4;
-                leftWing.scale.set(1, 0.5, 0.3);
-                
-                const rightWing = new THREE.Mesh(wingGeometry, wingMaterial);
-                rightWing.position.set(0.4, 0.2, 0.2);
-                rightWing.rotation.z = Math.PI / 4;
-                rightWing.scale.set(1, 0.5, 0.3);
-                
-                // Create dragon group
-                const dragon = new THREE.Group();
-                dragon.add(body);
-                dragon.add(head);
-                tailSegments.forEach(segment => dragon.add(segment));
-                dragon.add(leftWing);
-                dragon.add(rightWing);
-                
-                // Add eyes
-                const eyeGeometry = new THREE.SphereGeometry(0.03, 8, 6);
-                const eyeMaterial = new THREE.MeshBasicMaterial({ color: 0xFF0000, emissive: 0x330000 });
-                
-                const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-                leftEye.position.set(-0.08, 0.05, 0.15);
-                head.add(leftEye);
-                
-                const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-                rightEye.position.set(0.08, 0.05, 0.15);
-                head.add(rightEye);
-                
-                // Position and add to scene
-                dragon.position.set(0, -0.2, 0);
-                dragon.scale.set(1.5, 1.5, 1.5);
-                scene.add(dragon);
-                
-                // Camera position
-                camera.position.set(2, 1, 3);
-                camera.lookAt(0, 0, 0);
-                
-                // Animation loop
-                let animationId;
-                let time = 0;
-                function animate() {
-                    animationId = requestAnimationFrame(animate);
-                    time += 0.016;
-                    
-                    // Floating animation
-                    dragon.position.y = -0.2 + Math.sin(time * 3) * 0.1;
-                    dragon.rotation.y += 0.01;
-                    
-                    // Wing flapping
-                    const flapAngle = Math.sin(time * 8) * 0.3;
-                    leftWing.rotation.x = flapAngle;
-                    rightWing.rotation.x = -flapAngle;
-                    
-                    // Tail swaying
-                    tailSegments.forEach((segment, i) => {
-                        segment.rotation.y = Math.sin(time * 4 + i * 0.5) * 0.2;
-                    });
-                    
-                    // Eye glowing
-                    const glowIntensity = 0.5 + Math.sin(time * 6) * 0.3;
-                    leftEye.material.emissiveIntensity = glowIntensity;
-                    rightEye.material.emissiveIntensity = glowIntensity;
-                    
-                    renderer.render(scene, camera);
-                }
-                animate();
-                
-                // Store scene for cleanup
-                dragonScenes.set(position, { scene, renderer, animationId, dragon });
-                
-                // Entrance effect
-                dragon.scale.set(0, 0, 0);
-                const entranceAnimation = () => {
-                    const targetScale = 1.5;
-                    const currentScale = dragon.scale.x;
-                    if (currentScale < targetScale) {
-                        const newScale = currentScale + 0.08;
-                        dragon.scale.set(newScale, newScale, newScale);
-                        requestAnimationFrame(entranceAnimation);
-                    }
-                };
-                setTimeout(entranceAnimation, 100);
-                
-                console.log('✅ Geometric dragon created successfully');
-                
-            } catch (error) {
-                console.error('❌ Error creating geometric dragon:', error);
-                console.log('🔄 Using emoji fallback...');
-                createFallbackDragon(cell);
-            }
-        }
-
-        // Fallback CSS Dragon if 3D model fails
-        function createFallbackDragon(cell) {
-            console.log('🎭 Creating fallback dragon for cell:', cell);
-            const fallback = document.createElement('div');
-            fallback.innerHTML = '🐉';
-            fallback.className = 'fallback-dragon';
-            fallback.style.cssText = `
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                font-size: 2.5rem;
-                z-index: 15;
-                animation: dragonPulse 2s infinite;
-                filter: drop-shadow(0 0 15px rgba(255, 215, 0, 1));
-                pointer-events: none;
-            `;
-            cell.appendChild(fallback);
-            console.log('✅ Fallback dragon created');
-        }
-
-        // Add fallback animation
-        const fallbackStyle = document.createElement('style');
-        fallbackStyle.textContent = `
-            @keyframes dragonPulse {
-                0%, 100% { transform: translate(-50%, -50%) scale(1); }
-                50% { transform: translate(-50%, -50%) scale(1.2); }
-            }
-        `;
-        document.head.appendChild(fallbackStyle);
-
-        // Initialize Dragon System when page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            // Wait for both Three.js and GLTFLoader to load
-            setTimeout(initDragon3DSystem, 2000); // Increased delay
-        });
-
-        // ==================== END 3D DRAGON SYSTEM ====================
-
-        // Test Dragon Function
-        function testDragon() {
-            console.log('🧪 Testing dragon creation...');
-            const testCell = document.querySelector('[data-row="0"][data-col="0"]');
-            if (testCell) {
-                testCell.classList.add('banker');
-                testCell.textContent = 'B';
-                createDragon3D(testCell, '0,0');
-            }
-        }
-
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', init);
-
-        // Add some extra visual effects
-        document.addEventListener('visibilitychange', function() {
-            if (!document.hidden) {
-                // Refresh particles when page becomes visible
-                createParticles();
-            }
-        });
 
     </script>
 </body>
