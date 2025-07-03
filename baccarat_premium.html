@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎰 Baccarat Big Road - Premium Casino</title>
+    <!-- Three.js for 3D Dragon Models -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Try direct GLTFLoader from unpkg -->
+    <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script>
+        // Backup: Load GLTFLoader dynamically if not available
+        function loadGLTFLoader() {
+            if (typeof THREE !== 'undefined' && !THREE.GLTFLoader) {
+                return new Promise((resolve, reject) => {
+                    const script = document.createElement('script');
+                    script.onload = () => {
+                        console.log('📦 GLTFLoader backup script loaded');
+                        resolve();
+                    };
+                    script.onerror = reject;
+                    script.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js';
+                    document.head.appendChild(script);
+                });
+            }
+            return Promise.resolve();
+        }
+        
+        // Initialize backup loader when page loads
+        window.addEventListener('load', () => loadGLTFLoader().catch(console.error));
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-bg: #0d0d0d;
+            --secondary-bg: #1a1a1a;
+            --accent-bg: #2d2d2d;
+            --card-bg: #1f1f1f;
+            --border-color: #333;
+            --gold: #FFD700;
+            --banker-color: #ff4757;
+            --player-color: #3742fa;
+            --tie-color: #2ed573;
+            --text-primary: #ffffff;
+            --text-secondary: #b8b8b8;
+            --shadow-glow: 0 0 20px rgba(255, 215, 0, 0.3);
+            --shadow-dark: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--primary-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 71, 87, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(55, 66, 250, 0.1) 0%, transparent 50%);
+            background-attachment: fixed;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Styles */
+        .app-header {
+            background: linear-gradient(135deg, var(--card-bg) 0%, var(--accent-bg) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px 40px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(20px);
+            box-shadow: var(--shadow-dark);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--banker-color), var(--gold), var(--player-color));
+            animation: headerGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes headerGlow {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .app-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .title-icon {
+            font-size: 2.5rem;
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .title-text h1 {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.2rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--gold), #fff, var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 5px;
+        }
+
+        .title-text p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .live-stats {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .stat-dot.banker { background: var(--banker-color); }
+        .stat-dot.player { background: var(--player-color); }
+        .stat-dot.tie { background: var(--tie-color); }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+        }
+
+        .stat-text {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .stat-count {
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        /* Control Panel */
+        .control-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-dark);
+        }
+
+        .control-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--gold);
+            margin-bottom: 20px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .game-btn {
+            position: relative;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 16px;
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .game-btn:hover::before {
+            left: 100%;
+        }
+
+        .game-btn.banker {
+            background: linear-gradient(135deg, var(--banker-color), #ff6b7a);
+            box-shadow: 0 4px 20px rgba(255, 71, 87, 0.4);
+        }
+
+        .game-btn.player {
+            background: linear-gradient(135deg, var(--player-color), #5352ed);
+            box-shadow: 0 4px 20px rgba(55, 66, 250, 0.4);
+        }
+
+        .game-btn.tie {
+            background: linear-gradient(135deg, var(--tie-color), #26de81);
+            box-shadow: 0 4px 20px rgba(46, 213, 115, 0.4);
+        }
+
+        .game-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .game-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .action-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .action-btn {
+            padding: 12px 24px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--secondary-bg);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+        }
+
+        /* Big Road Container */
+        .road-container {
+            flex: 1;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow-dark);
+            position: relative;
+        }
+
+        .road-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .road-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .road-info {
+            display: flex;
+            gap: 20px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .road-grid-container {
+            background: var(--primary-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 15px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: var(--gold) var(--secondary-bg);
+        }
+
+        .road-grid-container::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .road-grid-container::-webkit-scrollbar-track {
+            background: var(--secondary-bg);
+            border-radius: 4px;
+        }
+
+        .road-grid-container::-webkit-scrollbar-thumb {
+            background: linear-gradient(90deg, var(--gold), #ffed4e);
+            border-radius: 4px;
+        }
+
+        .big-road-grid {
+            display: grid;
+            grid-template-rows: repeat(6, 45px);
+            grid-template-columns: repeat(50, 45px);
+            gap: 2px;
+            min-width: 2350px;
+        }
+
+        .road-cell {
+            background: var(--secondary-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: white;
+            position: relative;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .road-cell:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+
+        .road-cell.banker {
+            background: linear-gradient(135deg, #ff1744, #ff5722, #ff8a65);
+            border: 4px solid #fff;
+            box-shadow: 
+                0 0 30px rgba(255, 23, 68, 0.8),
+                inset 0 0 25px rgba(255, 255, 255, 0.4),
+                0 0 8px rgba(0, 0, 0, 0.9);
+            color: white;
+            font-weight: 900;
+            text-shadow: 0 3px 6px rgba(0, 0, 0, 0.8);
+        }
+
+        .road-cell.player {
+            background: linear-gradient(135deg, #2196f3, #03a9f4, #4fc3f7);
+            border: 4px solid #fff;
+            box-shadow: 
+                0 0 30px rgba(33, 150, 243, 0.8),
+                inset 0 0 25px rgba(255, 255, 255, 0.4),
+                0 0 8px rgba(0, 0, 0, 0.9);
+            color: white;
+            font-weight: 900;
+            text-shadow: 0 3px 6px rgba(0, 0, 0, 0.8);
+        }
+
+        .road-cell.empty {
+            background: var(--secondary-bg);
+            border-color: var(--border-color);
+        }
+
+
+
+        /* Tie Indicators */
+        .tie-indicator {
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            background: linear-gradient(135deg, #059669, #10b981, #34d399);
+            color: white;
+            font-size: 11px;
+            font-weight: 900;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            border: 2px solid #fff;
+            box-shadow: 
+                0 3px 10px rgba(0, 0, 0, 0.4),
+                inset 0 0 8px rgba(255, 255, 255, 0.3);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .tie-indicator.multiple {
+            background: linear-gradient(135deg, #dc2626, #ef4444, #f87171);
+            transform: scale(1.1);
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Orbitron', monospace;
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .app-container {
+                padding: 15px;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .live-stats {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .game-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .game-btn {
+                width: 200px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-header {
+                padding: 20px 25px;
+            }
+            
+            .title-text h1 {
+                font-size: 1.8rem;
+            }
+            
+            .control-panel {
+                padding: 20px;
+            }
+            
+            .road-container {
+                padding: 20px;
+            }
+            
+            .big-road-grid {
+                grid-template-rows: repeat(6, 35px);
+                grid-template-columns: repeat(50, 35px);
+                min-width: 1800px;
+            }
+            
+            .road-cell {
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Custom Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Particle Effects */
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--gold);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 3s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { 
+                transform: translateY(0) scale(0.5);
+                opacity: 0;
+            }
+            50% { 
+                transform: translateY(-20px) scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Particle Effects */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--gold);
+            border-radius: 50%;
+            animation: float 6s infinite linear;
+            opacity: 0.3;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.3;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(-10px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Particle Effects -->
+    <div class="particles" id="particles"></div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header fade-in">
+            <div class="header-content">
+                <div class="app-title">
+                    <div class="title-icon">🎰</div>
+                    <div class="title-text">
+                        <h1>BACCARAT BIG ROAD</h1>
+                        <p>Premium Casino Experience</p>
+                    </div>
+                </div>
+                <div class="live-stats">
+                    <div class="stat-item">
+                        <div class="stat-dot banker"></div>
+                        <div class="stat-text">Banker: <span class="stat-count" id="banker-count">0</span></div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-dot player"></div>
+                        <div class="stat-text">Player: <span class="stat-count" id="player-count">0</span></div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-dot tie"></div>
+                        <div class="stat-text">Tie: <span class="stat-count" id="tie-count">0</span></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Control Panel -->
+        <div class="control-panel fade-in">
+            <div class="control-title">🎮 Game Controls</div>
+            <div class="game-controls">
+                <button class="game-btn banker" onclick="addResult('B')">
+                    🏛️ Banker
+                </button>
+                <button class="game-btn player" onclick="addResult('P')">
+                    👤 Player
+                </button>
+                <button class="game-btn tie" onclick="addResult('T')">
+                    🤝 Tie
+                </button>
+            </div>
+            <div class="action-controls">
+                <button class="action-btn" onclick="undoLast()">
+                    ↶ Undo
+                </button>
+                <button class="action-btn" onclick="clearAll()">
+                    🗑️ Clear All
+                </button>
+            </div>
+        </div>
+
+        <!-- Big Road -->
+        <div class="road-container fade-in">
+            <div class="road-header">
+                <div class="road-title">🛣️ Big Road Matrix</div>
+                <div class="road-info">
+                    <span>6 Rows × 50 Columns</span>
+                    <span>•</span>
+                    <span>Live Tracking</span>
+                </div>
+            </div>
+            <div class="road-grid-container">
+                <div class="big-road-grid" id="big-road-grid">
+                    <!-- Grid cells will be generated by JavaScript -->
+                </div>
+                <div class="loading" id="loading">⚡ Processing...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Core game state
+        let gameHistory = [];
+        let bigRoadMatrix = [];
+        
+        // Constants
+        const ROWS = 6;
+        const COLS = 50;
+
+        // Initialize the application
+        function init() {
+            createParticles();
+            createBigRoadGrid();
+            updateDisplay();
+            addKeyboardShortcuts();
+        }
+
+        // Create particle effects
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Create the Big Road grid
+        function createBigRoadGrid() {
+            const grid = document.getElementById('big-road-grid');
+            grid.innerHTML = '';
+            
+            for (let row = 0; row < ROWS; row++) {
+                for (let col = 0; col < COLS; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'road-cell empty';
+                    cell.dataset.row = row;
+                    cell.dataset.col = col;
+                    cell.addEventListener('mouseenter', () => {
+                        if (!cell.classList.contains('empty')) {
+                            cell.style.transform = 'scale(1.1)';
+                        }
+                    });
+                    cell.addEventListener('mouseleave', () => {
+                        cell.style.transform = 'scale(1)';
+                    });
+                    grid.appendChild(cell);
+                }
+            }
+        }
+
+        // Add a new game result with animation
+        function addResult(result) {
+            gameHistory.push(result);
+            showLoading();
+            
+            setTimeout(() => {
+                updateDisplay();
+                autoScrollToLatest();
+                hideLoading();
+                
+                // Add visual feedback
+                const buttons = document.querySelectorAll('.game-btn');
+                buttons.forEach(btn => {
+                    if (btn.classList.contains(result.toLowerCase() === 'b' ? 'banker' : result.toLowerCase() === 'p' ? 'player' : 'tie')) {
+                        btn.style.transform = 'scale(0.95)';
+                        setTimeout(() => {
+                            btn.style.transform = 'scale(1)';
+                        }, 150);
+                    }
+                });
+            }, 100);
+        }
+
+        // Show loading animation
+        function showLoading() {
+            document.getElementById('loading').classList.add('active');
+        }
+
+        // Hide loading animation
+        function hideLoading() {
+            document.getElementById('loading').classList.remove('active');
+        }
+
+        // Undo the last result
+        function undoLast() {
+            if (gameHistory.length > 0) {
+                gameHistory.pop();
+                updateDisplay();
+            }
+        }
+
+        // Clear all results with confirmation
+        function clearAll() {
+            if (gameHistory.length === 0) return;
+            
+            if (confirm('🎰 Are you sure you want to clear all game data?')) {
+                gameHistory = [];
+                updateDisplay();
+                
+                // Reset animation
+                const cells = document.querySelectorAll('.road-cell');
+                cells.forEach(cell => {
+                    cell.style.animation = 'fadeIn 0.3s ease-in-out';
+                });
+            }
+        }
+
+        // Update the entire display
+        function updateDisplay() {
+            updateStats();
+            updateBigRoad();
+        }
+
+        // Update statistics with smooth transitions
+        function updateStats() {
+            const stats = {
+                B: gameHistory.filter(r => r === 'B').length,
+                P: gameHistory.filter(r => r === 'P').length,
+                T: gameHistory.filter(r => r === 'T').length
+            };
+            
+            animateCounterUpdate('banker-count', stats.B);
+            animateCounterUpdate('player-count', stats.P);
+            animateCounterUpdate('tie-count', stats.T);
+        }
+
+        // Animate counter updates
+        function animateCounterUpdate(elementId, newValue) {
+            const element = document.getElementById(elementId);
+            const currentValue = parseInt(element.textContent) || 0;
+            
+            if (currentValue !== newValue) {
+                element.style.transform = 'scale(1.2)';
+                element.style.color = 'var(--gold)';
+                
+                setTimeout(() => {
+                    element.textContent = newValue;
+                    element.style.transform = 'scale(1)';
+                    element.style.color = '';
+                }, 150);
+            }
+        }
+
+        // Update Big Road display
+        function updateBigRoad() {
+            // Clear current display
+            const cells = document.querySelectorAll('.road-cell');
+            cells.forEach(cell => {
+                cell.className = 'road-cell empty';
+                cell.textContent = '';
+            });
+
+            // Reset matrix
+            bigRoadMatrix = Array(ROWS).fill().map(() => Array(COLS).fill(null));
+
+            // Filter non-tie results to create streaks
+            const nonTieResults = gameHistory.filter(r => r !== 'T');
+            if (nonTieResults.length === 0) return;
+
+            // Group into streaks
+            const streaks = [];
+            let currentStreak = [nonTieResults[0]];
+            
+            for (let i = 1; i < nonTieResults.length; i++) {
+                if (nonTieResults[i] === currentStreak[0]) {
+                    currentStreak.push(nonTieResults[i]);
+                } else {
+                    streaks.push([...currentStreak]);
+                    currentStreak = [nonTieResults[i]];
+                }
+            }
+            if (currentStreak.length > 0) {
+                streaks.push(currentStreak);
+            }
+
+            // Place streaks on grid
+            let currentCol = 0;
+            const usedPositions = new Set();
+
+            console.log('📊 Streaks analysis:', streaks.map((s, i) => `Streak ${i+1}: ${s[0]} x${s.length}`).join(', '));
+
+            streaks.forEach((streak, streakIndex) => {
+                const result = streak[0];
+                let row = 0;
+                let placedCount = 0;
+
+                // Find available column (check for collision)
+                while (currentCol < COLS && usedPositions.has(`0,${currentCol}`)) {
+                    currentCol++;
+                }
+
+                // Place streak vertically first
+                for (let i = 0; i < streak.length && row < ROWS; i++) {
+                    const pos = `${row},${currentCol}`;
+                    if (!usedPositions.has(pos)) {
+                        bigRoadMatrix[row][currentCol] = result;
+                        usedPositions.add(pos);
+                        placedCount++;
+                        row++;
+                    } else {
+                        // Hit collision - place remaining results horizontally if streak is long enough (7+)
+                        if (streak.length >= 7) {
+                            let dragonRow = Math.max(0, row - 1);
+                            let dragonCol = currentCol + 1;
+                            
+                            // Place remaining results horizontally at the row before collision
+                            for (let j = i; j < streak.length; j++) {
+                                // Find next available column for dragon tail
+                                while (dragonCol < COLS && usedPositions.has(`${dragonRow},${dragonCol}`)) {
+                                    dragonCol++;
+                                }
+                                
+                                if (dragonCol < COLS) {
+                                    const pos = `${dragonRow},${dragonCol}`;
+                                    bigRoadMatrix[dragonRow][dragonCol] = result;
+                                    usedPositions.add(pos);
+                                    dragonCol++;
+                                }
+                            }
+                        }
+                        break; // Exit the vertical placement loop
+                    }
+                }
+
+                // If we filled the column (no collision, just exceeded 6 rows) and streak is long enough
+                if (placedCount < streak.length && row >= ROWS && streak.length >= 7) {
+                    // Start dragon tail at bottom row (row 5)
+                    let dragonRow = ROWS - 1;
+                    let dragonCol = currentCol + 1;
+                    
+                    // Place remaining results horizontally at bottom row
+                    for (let i = placedCount; i < streak.length; i++) {
+                        // Find next available column for dragon tail
+                        while (dragonCol < COLS && usedPositions.has(`${dragonRow},${dragonCol}`)) {
+                            dragonCol++;
+                        }
+                        
+                        if (dragonCol < COLS) {
+                            const pos = `${dragonRow},${dragonCol}`;
+                            bigRoadMatrix[dragonRow][dragonCol] = result;
+                            usedPositions.add(pos);
+                            dragonCol++;
+                        }
+                    }
+                }
+
+                // Move to next column for next streak
+                currentCol++;
+            });
+
+            // Render the matrix to DOM with animations
+            for (let row = 0; row < ROWS; row++) {
+                for (let col = 0; col < COLS; col++) {
+                    const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+                    const value = bigRoadMatrix[row][col];
+                    
+                    if (value) {
+                        cell.classList.add(value === 'B' ? 'banker' : 'player');
+                        cell.textContent = value;
+                        cell.classList.add('slide-in');
+                    }
+                }
+            }
+
+            // Add current streak and tail numbering effects
+            addCurrentStreakEffects();
+
+            // Add tie markers
+            addTieMarkers();
+        }
+
+
+
+        // Add current streak effects for visual enhancement  
+        function addCurrentStreakEffects() {
+            // Remove existing current-streak classes
+            document.querySelectorAll('.road-cell.current-streak').forEach(cell => {
+                cell.classList.remove('current-streak');
+            });
+
+            if (gameHistory.length === 0) return;
+
+            // Get the last streak
+            const nonTieResults = gameHistory.filter(r => r !== 'T');
+            if (nonTieResults.length === 0) return;
+
+            // Find the current (last) streak
+            const lastResult = nonTieResults[nonTieResults.length - 1];
+            let currentStreakLength = 1;
+            
+            for (let i = nonTieResults.length - 2; i >= 0; i--) {
+                if (nonTieResults[i] === lastResult) {
+                    currentStreakLength++;
+                } else {
+                    break;
+                }
+            }
+
+            // Apply current streak effects to visible cells
+            const allCells = document.querySelectorAll('.road-cell');
+            let streakCount = 0;
+            
+            // Mark the last few results as current streak
+            allCells.forEach(cell => {
+                if (cell.textContent === lastResult && streakCount < currentStreakLength) {
+                    cell.classList.add('current-streak');
+                    streakCount++;
+                }
+            });
+        }
+
+        // Add tie markers to the appropriate cells
+        function addTieMarkers() {
+            // Create a list of all non-tie cell positions in the order they appear in the game
+            const cellPositions = [];
+            
+            // Rebuild the cell positions following the same logic as updateBigRoad
+            const nonTieResults = gameHistory.filter(r => r !== 'T');
+            if (nonTieResults.length === 0) return;
+
+            // Group into streaks
+            const streaks = [];
+            let currentStreak = [nonTieResults[0]];
+            
+            for (let i = 1; i < nonTieResults.length; i++) {
+                if (nonTieResults[i] === currentStreak[0]) {
+                    currentStreak.push(nonTieResults[i]);
+                } else {
+                    streaks.push([...currentStreak]);
+                    currentStreak = [nonTieResults[i]];
+                }
+            }
+            if (currentStreak.length > 0) {
+                streaks.push(currentStreak);
+            }
+
+            // Track positions exactly like in updateBigRoad
+            let currentCol = 0;
+            const usedPositions = new Set();
+
+            streaks.forEach((streak, streakIndex) => {
+                const result = streak[0];
+                let row = 0;
+                let placedCount = 0;
+
+                // Find available column (check for collision)
+                while (currentCol < COLS && usedPositions.has(`0,${currentCol}`)) {
+                    currentCol++;
+                }
+
+                // Place streak vertically first
+                for (let i = 0; i < streak.length && row < ROWS; i++) {
+                    const pos = `${row},${currentCol}`;
+                    if (!usedPositions.has(pos)) {
+                        cellPositions.push({ row, col: currentCol });
+                        usedPositions.add(pos);
+                        placedCount++;
+                        row++;
+                    } else {
+                        // Hit collision - place remaining results horizontally if streak is long enough (7+)
+                        if (streak.length >= 7) {
+                            let dragonRow = Math.max(0, row - 1);
+                            let dragonCol = currentCol + 1;
+                            
+                            // Place remaining results horizontally at the row before collision
+                            for (let j = i; j < streak.length; j++) {
+                                // Find next available column for dragon tail
+                                while (dragonCol < COLS && usedPositions.has(`${dragonRow},${dragonCol}`)) {
+                                    dragonCol++;
+                                }
+                                
+                                if (dragonCol < COLS) {
+                                    cellPositions.push({ row: dragonRow, col: dragonCol });
+                                    usedPositions.add(`${dragonRow},${dragonCol}`);
+                                    dragonCol++;
+                                }
+                            }
+                        }
+                        break; // Exit the vertical placement loop
+                    }
+                }
+
+                // If we filled the column (no collision, just exceeded 6 rows) and streak is long enough
+                if (placedCount < streak.length && row >= ROWS && streak.length >= 7) {
+                    // Start dragon tail at bottom row (row 5)
+                    let dragonRow = ROWS - 1;
+                    let dragonCol = currentCol + 1;
+                    
+                    // Place remaining results horizontally at bottom row
+                    for (let i = placedCount; i < streak.length; i++) {
+                        // Find next available column for dragon tail
+                        while (dragonCol < COLS && usedPositions.has(`${dragonRow},${dragonCol}`)) {
+                            dragonCol++;
+                        }
+                        
+                        if (dragonCol < COLS) {
+                            cellPositions.push({ row: dragonRow, col: dragonCol });
+                            usedPositions.add(`${dragonRow},${dragonCol}`);
+                            dragonCol++;
+                        }
+                    }
+                }
+
+                // Move to next column for next streak
+                currentCol++;
+            });
+
+            // Now apply tie markers using the correct positions
+            let nonTieIndex = -1;
+            
+            gameHistory.forEach((result, gameIndex) => {
+                if (result === 'T') {
+                    // Tie should be placed on the PREVIOUS non-tie hand
+                    if (nonTieIndex >= 0 && nonTieIndex < cellPositions.length) {
+                        const { row, col } = cellPositions[nonTieIndex];
+                        const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+                        if (cell && bigRoadMatrix[row][col]) {
+                            // Check if tie indicator already exists
+                            let tieIndicator = cell.querySelector('.tie-indicator');
+                            let currentTieCount = 1;
+                            
+                            if (tieIndicator) {
+                                // Get current count and increment
+                                currentTieCount = parseInt(tieIndicator.textContent) + 1;
+                                tieIndicator.remove();
+                            }
+                            
+                            // Create new tie indicator with updated count
+                            tieIndicator = document.createElement('div');
+                            tieIndicator.className = 'tie-indicator';
+                            
+                            // Add special styling for multiple ties
+                            if (currentTieCount > 1) {
+                                tieIndicator.classList.add('multiple');
+                            }
+                            
+                            tieIndicator.textContent = currentTieCount;
+                            cell.appendChild(tieIndicator);
+                            
+                            // Add entrance animation
+                            setTimeout(() => {
+                                // Removed blinking animations for tie indicators
+                            }, 100);
+                        }
+                    }
+                } else {
+                    // This is a non-tie result, increment the index
+                    nonTieIndex++;
+                }
+            });
+        }
+
+        // Auto scroll to show the latest results
+        function autoScrollToLatest() {
+            const roadContainer = document.querySelector('.road-grid-container');
+            const gridWidth = COLS * 47; // 45px + 2px gap
+            const containerWidth = roadContainer.clientWidth;
+            
+            // Find the rightmost occupied column
+            let lastCol = 0;
+            for (let col = COLS - 1; col >= 0; col--) {
+                for (let row = 0; row < ROWS; row++) {
+                    if (bigRoadMatrix[row][col]) {
+                        lastCol = col;
+                        break;
+                    }
+                }
+                if (lastCol > 0) break;
+            }
+            
+            // Smooth scroll to keep the latest results visible
+            if (lastCol * 47 > containerWidth - 200) {
+                roadContainer.scrollTo({
+                    left: (lastCol * 47) - containerWidth + 200,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        // Add keyboard shortcuts
+        function addKeyboardShortcuts() {
+            document.addEventListener('keydown', function(e) {
+                switch(e.key.toLowerCase()) {
+                    case 'b':
+                        addResult('B');
+                        break;
+                    case 'p':
+                        addResult('P');
+                        break;
+                    case 't':
+                        addResult('T');
+                        break;
+                    case 'z':
+                        if (e.ctrlKey || e.metaKey) {
+                            e.preventDefault();
+                            undoLast();
+                        }
+                        break;
+                    case 'delete':
+                    case 'backspace':
+                        if (e.ctrlKey || e.metaKey) {
+                            e.preventDefault();
+                            clearAll();
+                        }
+                        break;
+                }
+            });
+        }
+
+        // ==================== 3D DRAGON SYSTEM ====================
+        
+        // Dragon 3D System State
+        let dragonEffectsEnabled = true;
+        let dragonScenes = new Map(); // Map of cell positions to 3D scenes
+        let dragonModels = new Map(); // Cache loaded models
+        let dragonLoader = null;
+
+        // Initialize Dragon 3D System
+        function initDragon3DSystem() {
+            console.log('🚀 Initializing Dragon 3D System...');
+            console.log('🔍 THREE available:', typeof THREE !== 'undefined');
+            console.log('🔍 THREE.GLTFLoader available:', typeof THREE !== 'undefined' && !!THREE.GLTFLoader);
+            console.log('🔍 window.GLTFLoader available:', typeof window.GLTFLoader !== 'undefined');
+            console.log('🔍 global GLTFLoader available:', typeof GLTFLoader !== 'undefined');
+            
+            // Try multiple ways to get GLTFLoader
+            if (typeof THREE !== 'undefined' && THREE.GLTFLoader) {
+                dragonLoader = new THREE.GLTFLoader();
+                console.log('✅ Dragon 3D System initialized with THREE.GLTFLoader');
+                return;
+            }
+            
+            if (typeof window.GLTFLoader !== 'undefined') {
+                dragonLoader = new window.GLTFLoader();
+                console.log('✅ Dragon 3D System initialized with window.GLTFLoader');
+                return;
+            }
+            
+            if (typeof GLTFLoader !== 'undefined') {
+                dragonLoader = new GLTFLoader();
+                console.log('✅ Dragon 3D System initialized with global GLTFLoader');
+                return;
+            }
+            
+            console.warn('⚠️ No GLTFLoader found - will use fallback dragons only');
+            console.log('🔄 Will retry in 1 second...');
+            
+            // Retry after a short delay (only once)
+            if (!initDragon3DSystem.retried) {
+                initDragon3DSystem.retried = true;
+                setTimeout(() => {
+                    console.log('🔄 Retrying GLTFLoader initialization...');
+                    initDragon3DSystem();
+                }, 1000);
+            }
+        }
+
+        // Toggle Dragon Effects
+        function toggleDragonEffects() {
+            dragonEffectsEnabled = !dragonEffectsEnabled;
+            const toggleBtn = document.getElementById('dragon-toggle');
+            
+            if (dragonEffectsEnabled) {
+                toggleBtn.textContent = '🐉 Dragon Effects: ON';
+                toggleBtn.classList.add('active');
+                updateBigRoad(); // Refresh to show dragons
+            } else {
+                toggleBtn.textContent = '🐉 Dragon Effects: OFF';
+                toggleBtn.classList.remove('active');
+                clearAllDragons();
+            }
+        }
+
+        // Clear All Dragons
+        function clearAllDragons() {
+            dragonScenes.forEach((scene, position) => {
+                const cell = document.querySelector(`[data-row="${position.split(',')[0]}"][data-col="${position.split(',')[1]}"]`);
+                if (cell) {
+                    const container = cell.querySelector('.dragon-canvas-container');
+                    if (container) {
+                        container.remove();
+                    }
+                    cell.classList.remove('dragon-tail-3d');
+                }
+            });
+            dragonScenes.clear();
+        }
+
+        // Create 3D Dragon on Dragon Tail Cell
+        function createDragon3D(cell, position) {
+            console.log(`🐉 createDragon3D called for position: ${position}`);
+            console.log(`🔍 dragonEffectsEnabled: ${dragonEffectsEnabled}`);
+            console.log(`🔍 dragonLoader exists: ${!!dragonLoader}`);
+            
+            if (!dragonEffectsEnabled) {
+                console.log('❌ Dragon effects disabled');
+                return;
+            }
+            
+            // Always create fallback dragon first as backup
+            createFallbackDragon(cell);
+            
+            // Then try to create 3D dragon if loader available
+            if (!dragonLoader) {
+                console.log('❌ Dragon loader not available - trying geometric dragon...');
+                // Try to create geometric dragon instead
+                if (typeof THREE !== 'undefined') {
+                    // Create canvas container
+                    const canvasContainer = document.createElement('div');
+                    canvasContainer.className = 'dragon-canvas-container';
+                    
+                    const canvas = document.createElement('canvas');
+                    canvas.className = 'dragon-canvas';
+                    canvasContainer.appendChild(canvas);
+                    cell.appendChild(canvasContainer);
+
+                    // Setup Three.js scene
+                    const scene = new THREE.Scene();
+                    const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+                    const renderer = new THREE.WebGLRenderer({ 
+                        canvas: canvas, 
+                        alpha: true,
+                        antialias: true 
+                    });
+                    
+                    renderer.setSize(100, 60);
+                    renderer.setClearColor(0x000000, 0);
+                    renderer.shadowMap.enabled = true;
+                    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+                    // Add lighting
+                    const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+                    scene.add(ambientLight);
+
+                    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+                    directionalLight.position.set(5, 5, 5);
+                    directionalLight.castShadow = true;
+                    scene.add(directionalLight);
+
+                    const rimLight = new THREE.DirectionalLight(0xFFD700, 0.8);
+                    rimLight.position.set(-5, 3, -5);
+                    scene.add(rimLight);
+
+                    // Create geometric dragon
+                    createGeometricDragon(cell, scene, camera, renderer, position);
+                    return;
+                }
+                console.log('❌ Three.js not available - using emoji fallback only');
+                return;
+            }
+
+            // Remove existing dragon
+            const existingContainer = cell.querySelector('.dragon-canvas-container');
+            if (existingContainer) {
+                existingContainer.remove();
+            }
+
+            // Add dragon tail class
+            cell.classList.add('dragon-tail-3d');
+
+            // Create canvas container
+            const canvasContainer = document.createElement('div');
+            canvasContainer.className = 'dragon-canvas-container';
+            
+            const canvas = document.createElement('canvas');
+            canvas.className = 'dragon-canvas';
+            canvasContainer.appendChild(canvas);
+            cell.appendChild(canvasContainer);
+
+            // Setup Three.js scene
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ 
+                canvas: canvas, 
+                alpha: true,
+                antialias: true 
+            });
+            
+            renderer.setSize(100, 60); // Small size for cell
+            renderer.setClearColor(0x000000, 0); // Transparent background
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(5, 5, 5);
+            directionalLight.castShadow = true;
+            directionalLight.shadow.mapSize.width = 512;
+            directionalLight.shadow.mapSize.height = 512;
+            scene.add(directionalLight);
+
+            // Add golden rim light for casino effect
+            const rimLight = new THREE.DirectionalLight(0xFFD700, 0.8);
+            rimLight.position.set(-5, 3, -5);
+            scene.add(rimLight);
+
+            // Add point light for dramatic effect
+            const pointLight = new THREE.PointLight(0xFFD700, 1, 10);
+            pointLight.position.set(0, 2, 2);
+            pointLight.castShadow = true;
+            scene.add(pointLight);
+
+            // Add subtle color-changing ambient
+            const colorLight = new THREE.AmbientLight(0x000000, 0.3);
+            scene.add(colorLight);
+
+            // Load Dragon Model
+            console.log('🔄 Starting to load dragon model...');
+            dragonLoader.load('source/low_poly_dragon_white.glb', (gltf) => {
+                console.log('✅ Dragon model loaded successfully!');
+                const dragon = gltf.scene;
+                
+                // Scale and position dragon
+                dragon.scale.set(2, 2, 2);
+                dragon.position.set(0, -0.5, 0);
+                dragon.rotation.y = Math.PI / 4; // Slight angle
+                
+                // Load custom texture
+                const textureLoader = new THREE.TextureLoader();
+                textureLoader.load('textures/gltf_embedded_0.png', (texture) => {
+                    // Configure texture
+                    texture.wrapS = THREE.RepeatWrapping;
+                    texture.wrapT = THREE.RepeatWrapping;
+                    texture.flipY = false;
+                    
+                    // Apply custom material with texture and casino effects
+                    dragon.traverse((child) => {
+                        if (child.isMesh) {
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+                            
+                            // Create premium casino material
+                            const casinoMaterial = new THREE.MeshPhongMaterial({
+                                map: texture,
+                                color: 0xFFD700, // Golden tint
+                                emissive: 0x442200, // Warm golden glow
+                                emissiveIntensity: 0.2,
+                                shininess: 100,
+                                specular: 0xFFD700, // Golden reflections
+                                transparent: true,
+                                opacity: 0.95
+                            });
+                            
+                            child.material = casinoMaterial;
+                        }
+                    });
+                    
+                    console.log('🎨 Dragon texture loaded successfully');
+                }, undefined, (error) => {
+                    console.warn('⚠️ Could not load dragon texture, using default material');
+                    // Fallback to default material with golden effects
+                    dragon.traverse((child) => {
+                        if (child.isMesh) {
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+                            
+                            if (child.material) {
+                                child.material.emissive = new THREE.Color(0x333300);
+                                child.material.emissiveIntensity = 0.1;
+                                child.material.color = new THREE.Color(0xFFD700);
+                            }
+                        }
+                    });
+                });
+
+                scene.add(dragon);
+
+                // Add magical particles around dragon
+                const particleGeometry = new THREE.BufferGeometry();
+                const particleCount = 20;
+                const positions = new Float32Array(particleCount * 3);
+                const velocities = new Float32Array(particleCount * 3);
+                
+                for (let i = 0; i < particleCount; i++) {
+                    positions[i * 3] = (Math.random() - 0.5) * 4;
+                    positions[i * 3 + 1] = (Math.random() - 0.5) * 2;
+                    positions[i * 3 + 2] = (Math.random() - 0.5) * 4;
+                    
+                    velocities[i * 3] = (Math.random() - 0.5) * 0.01;
+                    velocities[i * 3 + 1] = Math.random() * 0.02;
+                    velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.01;
+                }
+                
+                particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                
+                const particleMaterial = new THREE.PointsMaterial({
+                    color: 0xFFD700,
+                    size: 0.05,
+                    transparent: true,
+                    opacity: 0.6,
+                    blending: THREE.AdditiveBlending
+                });
+                
+                const particles = new THREE.Points(particleGeometry, particleMaterial);
+                scene.add(particles);
+
+                // Camera position
+                camera.position.set(2, 1, 3);
+                camera.lookAt(0, 0, 0);
+
+                // Animation loop
+                let animationId;
+                let time = 0;
+                function animate() {
+                    animationId = requestAnimationFrame(animate);
+                    time += 0.016; // ~60fps
+                    
+                    // Gentle floating animation
+                    dragon.position.y = -0.5 + Math.sin(time * 3) * 0.1;
+                    dragon.rotation.y += 0.005; // Slow rotation
+                    
+                    // Breathing effect
+                    const scale = 2 + Math.sin(time * 2) * 0.05;
+                    dragon.scale.set(scale, scale, scale);
+                    
+                    // Animate particles
+                    const positions = particles.geometry.attributes.position.array;
+                    for (let i = 0; i < particleCount; i++) {
+                        positions[i * 3] += velocities[i * 3];
+                        positions[i * 3 + 1] += velocities[i * 3 + 1];
+                        positions[i * 3 + 2] += velocities[i * 3 + 2];
+                        
+                        // Reset particles that go too far
+                        if (positions[i * 3 + 1] > 3) {
+                            positions[i * 3] = (Math.random() - 0.5) * 4;
+                            positions[i * 3 + 1] = -1;
+                            positions[i * 3 + 2] = (Math.random() - 0.5) * 4;
+                        }
+                    }
+                    particles.geometry.attributes.position.needsUpdate = true;
+                    
+                    // Rotate particles around dragon
+                    particles.rotation.y += 0.01;
+                    
+                    // Dynamic lighting effects
+                    pointLight.intensity = 1 + Math.sin(time * 4) * 0.3;
+                    pointLight.position.x = Math.sin(time * 2) * 1;
+                    
+                    // Color-changing ambient light (subtle casino colors)
+                    const hue = (time * 0.1) % 1;
+                    const color = new THREE.Color().setHSL(hue, 0.3, 0.2);
+                    colorLight.color = color;
+                    
+                    // Rim light pulsing
+                    rimLight.intensity = 0.8 + Math.sin(time * 5) * 0.2;
+                    
+                    renderer.render(scene, camera);
+                }
+                animate();
+
+                // Store scene for cleanup
+                dragonScenes.set(position, { scene, renderer, animationId, dragon, particles, velocities });
+
+                // Add entrance effect
+                dragon.scale.set(0, 0, 0);
+                const entranceAnimation = () => {
+                    const targetScale = 2;
+                    const currentScale = dragon.scale.x;
+                    if (currentScale < targetScale) {
+                        const newScale = currentScale + 0.1;
+                        dragon.scale.set(newScale, newScale, newScale);
+                        requestAnimationFrame(entranceAnimation);
+                    }
+                };
+                setTimeout(entranceAnimation, 100);
+
+            }, undefined, (error) => {
+                console.error('❌ Error loading dragon model:', error);
+                console.log('🔄 Trying geometric dragon fallback...');
+                // Try geometric dragon fallback first
+                createGeometricDragon(cell, scene, camera, renderer, position);
+            });
+        }
+
+        // Create geometric 3D dragon if GLB model fails
+        function createGeometricDragon(cell, scene, camera, renderer, position) {
+            console.log('🔶 Creating geometric dragon...');
+            
+            try {
+                // Create dragon body (elongated sphere)
+                const bodyGeometry = new THREE.SphereGeometry(0.3, 8, 6);
+                const bodyMaterial = new THREE.MeshPhongMaterial({ 
+                    color: 0xFFD700, 
+                    emissive: 0x331100,
+                    emissiveIntensity: 0.2,
+                    shininess: 100 
+                });
+                const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+                body.scale.set(1, 0.7, 2); // Elongated
+                
+                // Create dragon head
+                const headGeometry = new THREE.SphereGeometry(0.2, 8, 6);
+                const head = new THREE.Mesh(headGeometry, bodyMaterial);
+                head.position.set(0, 0.1, 0.6);
+                head.scale.set(1.2, 1, 1.2);
+                
+                // Create dragon tail segments
+                const tailSegments = [];
+                for (let i = 0; i < 3; i++) {
+                    const segmentGeometry = new THREE.SphereGeometry(0.15 - i * 0.03, 6, 4);
+                    const segment = new THREE.Mesh(segmentGeometry, bodyMaterial);
+                    segment.position.set(0, -i * 0.05, -0.4 - i * 0.3);
+                    segment.scale.set(0.8 - i * 0.1, 0.8 - i * 0.1, 1);
+                    tailSegments.push(segment);
+                }
+                
+                // Create wings
+                const wingGeometry = new THREE.ConeGeometry(0.3, 0.6, 4);
+                const wingMaterial = new THREE.MeshPhongMaterial({ 
+                    color: 0xFFA500,
+                    transparent: true,
+                    opacity: 0.8,
+                    emissive: 0x221100,
+                    emissiveIntensity: 0.1 
+                });
+                
+                const leftWing = new THREE.Mesh(wingGeometry, wingMaterial);
+                leftWing.position.set(-0.4, 0.2, 0.2);
+                leftWing.rotation.z = -Math.PI / 4;
+                leftWing.scale.set(1, 0.5, 0.3);
+                
+                const rightWing = new THREE.Mesh(wingGeometry, wingMaterial);
+                rightWing.position.set(0.4, 0.2, 0.2);
+                rightWing.rotation.z = Math.PI / 4;
+                rightWing.scale.set(1, 0.5, 0.3);
+                
+                // Create dragon group
+                const dragon = new THREE.Group();
+                dragon.add(body);
+                dragon.add(head);
+                tailSegments.forEach(segment => dragon.add(segment));
+                dragon.add(leftWing);
+                dragon.add(rightWing);
+                
+                // Add eyes
+                const eyeGeometry = new THREE.SphereGeometry(0.03, 8, 6);
+                const eyeMaterial = new THREE.MeshBasicMaterial({ color: 0xFF0000, emissive: 0x330000 });
+                
+                const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+                leftEye.position.set(-0.08, 0.05, 0.15);
+                head.add(leftEye);
+                
+                const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+                rightEye.position.set(0.08, 0.05, 0.15);
+                head.add(rightEye);
+                
+                // Position and add to scene
+                dragon.position.set(0, -0.2, 0);
+                dragon.scale.set(1.5, 1.5, 1.5);
+                scene.add(dragon);
+                
+                // Camera position
+                camera.position.set(2, 1, 3);
+                camera.lookAt(0, 0, 0);
+                
+                // Animation loop
+                let animationId;
+                let time = 0;
+                function animate() {
+                    animationId = requestAnimationFrame(animate);
+                    time += 0.016;
+                    
+                    // Floating animation
+                    dragon.position.y = -0.2 + Math.sin(time * 3) * 0.1;
+                    dragon.rotation.y += 0.01;
+                    
+                    // Wing flapping
+                    const flapAngle = Math.sin(time * 8) * 0.3;
+                    leftWing.rotation.x = flapAngle;
+                    rightWing.rotation.x = -flapAngle;
+                    
+                    // Tail swaying
+                    tailSegments.forEach((segment, i) => {
+                        segment.rotation.y = Math.sin(time * 4 + i * 0.5) * 0.2;
+                    });
+                    
+                    // Eye glowing
+                    const glowIntensity = 0.5 + Math.sin(time * 6) * 0.3;
+                    leftEye.material.emissiveIntensity = glowIntensity;
+                    rightEye.material.emissiveIntensity = glowIntensity;
+                    
+                    renderer.render(scene, camera);
+                }
+                animate();
+                
+                // Store scene for cleanup
+                dragonScenes.set(position, { scene, renderer, animationId, dragon });
+                
+                // Entrance effect
+                dragon.scale.set(0, 0, 0);
+                const entranceAnimation = () => {
+                    const targetScale = 1.5;
+                    const currentScale = dragon.scale.x;
+                    if (currentScale < targetScale) {
+                        const newScale = currentScale + 0.08;
+                        dragon.scale.set(newScale, newScale, newScale);
+                        requestAnimationFrame(entranceAnimation);
+                    }
+                };
+                setTimeout(entranceAnimation, 100);
+                
+                console.log('✅ Geometric dragon created successfully');
+                
+            } catch (error) {
+                console.error('❌ Error creating geometric dragon:', error);
+                console.log('🔄 Using emoji fallback...');
+                createFallbackDragon(cell);
+            }
+        }
+
+        // Fallback CSS Dragon if 3D model fails
+        function createFallbackDragon(cell) {
+            console.log('🎭 Creating fallback dragon for cell:', cell);
+            const fallback = document.createElement('div');
+            fallback.innerHTML = '🐉';
+            fallback.className = 'fallback-dragon';
+            fallback.style.cssText = `
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 2.5rem;
+                z-index: 15;
+                animation: dragonPulse 2s infinite;
+                filter: drop-shadow(0 0 15px rgba(255, 215, 0, 1));
+                pointer-events: none;
+            `;
+            cell.appendChild(fallback);
+            console.log('✅ Fallback dragon created');
+        }
+
+        // Add fallback animation
+        const fallbackStyle = document.createElement('style');
+        fallbackStyle.textContent = `
+            @keyframes dragonPulse {
+                0%, 100% { transform: translate(-50%, -50%) scale(1); }
+                50% { transform: translate(-50%, -50%) scale(1.2); }
+            }
+        `;
+        document.head.appendChild(fallbackStyle);
+
+        // Initialize Dragon System when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Wait for both Three.js and GLTFLoader to load
+            setTimeout(initDragon3DSystem, 2000); // Increased delay
+        });
+
+        // ==================== END 3D DRAGON SYSTEM ====================
+
+        // Test Dragon Function
+        function testDragon() {
+            console.log('🧪 Testing dragon creation...');
+            const testCell = document.querySelector('[data-row="0"][data-col="0"]');
+            if (testCell) {
+                testCell.classList.add('banker');
+                testCell.textContent = 'B';
+                createDragon3D(testCell, '0,0');
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', init);
+
+        // Add some extra visual effects
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                // Refresh particles when page becomes visible
+                createParticles();
+            }
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+{
+  "name": "baccarat-strategies-tool",
+  "version": "1.0.0",
+  "description": "Công cụ phân tích và chiến lược Baccarat chuyên nghiệp",
+  "main": "index.html",
+  "scripts": {
+    "start": "open index.html",
+    "serve": "python -m http.server 8000",
+    "serve-node": "npx http-server -p 8000"
+  },
+  "keywords": [
+    "baccarat",
+    "casino",
+    "strategies",
+    "martingale",
+    "fibonacci",
+    "gambling",
+    "pattern-analysis"
+  ],
+  "author": "AI Assistant",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
