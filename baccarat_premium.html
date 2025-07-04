@@ -14,6 +14,22 @@
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Performance optimizations */
+        * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .road-cell, .game-btn, .stat-item {
+            will-change: transform;
+            backface-visibility: hidden;
+            transform: translateZ(0);
+        }
+
         :root {
             --primary-bg: #0d0d0d;
             --secondary-bg: #1a1a1a;
@@ -41,6 +57,31 @@
                 radial-gradient(circle at 40% 40%, rgba(55, 66, 250, 0.1) 0%, transparent 50%);
             background-attachment: fixed;
             overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated gradient background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(-45deg, 
+                rgba(255, 215, 0, 0.05), 
+                rgba(255, 71, 87, 0.05), 
+                rgba(55, 66, 250, 0.05), 
+                rgba(46, 213, 115, 0.05));
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            z-index: -2;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .app-container {
@@ -63,6 +104,14 @@
             box-shadow: var(--shadow-dark);
             position: relative;
             overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .app-header:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                var(--shadow-dark),
+                0 0 50px rgba(255, 215, 0, 0.1);
         }
 
         .app-header::before {
@@ -74,6 +123,23 @@
             height: 2px;
             background: linear-gradient(90deg, var(--banker-color), var(--gold), var(--player-color));
             animation: headerGlow 3s ease-in-out infinite alternate;
+        }
+
+        .app-header::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(255, 215, 0, 0.1), transparent, rgba(255, 71, 87, 0.1), transparent);
+            animation: headerRotate 20s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes headerRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         @keyframes headerGlow {
@@ -109,10 +175,36 @@
             font-size: 2.2rem;
             font-weight: 900;
             background: linear-gradient(45deg, var(--gold), #fff, var(--gold));
+            background-size: 200% 200%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             margin-bottom: 5px;
+            animation: titleShimmer 3s ease-in-out infinite;
+            position: relative;
+        }
+
+        .title-text h1::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: textSweep 2s ease-in-out infinite;
+        }
+
+        @keyframes titleShimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        @keyframes textSweep {
+            0% { background-position: -200% 0%; }
+            100% { background-position: 200% 0%; }
         }
 
         .title-text p {
@@ -138,6 +230,31 @@
             border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 215, 0, 0.3);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .stat-item:hover::before {
+            left: 100%;
         }
 
         .stat-dot {
@@ -205,11 +322,12 @@
             font-weight: 700;
             color: white;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             text-transform: uppercase;
             letter-spacing: 1px;
             overflow: hidden;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transform-style: preserve-3d;
         }
 
         .game-btn::before {
@@ -219,12 +337,32 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.6s ease;
+            z-index: 1;
+        }
+
+        .game-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3), transparent);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease, height 0.4s ease;
+            z-index: 0;
         }
 
         .game-btn:hover::before {
             left: 100%;
+        }
+
+        .game-btn:hover::after {
+            width: 200px;
+            height: 200px;
         }
 
         .game-btn.banker {
@@ -243,12 +381,13 @@
         }
 
         .game-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            transform: translateY(-5px) rotateX(10deg);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
         }
 
         .game-btn:active {
-            transform: translateY(-1px);
+            transform: translateY(-2px) rotateX(5deg) scale(0.98);
+            transition: all 0.1s ease;
         }
 
         .action-controls {
@@ -367,6 +506,7 @@
             transform-style: preserve-3d;
             perspective: 1000px;
             overflow: hidden;
+            will-change: transform;
         }
 
         .road-cell::before {
@@ -376,10 +516,24 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.15) 50%, transparent 70%);
             transform: translateX(-100%);
             transition: transform 0.6s ease;
             z-index: 1;
+        }
+
+        .road-cell::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            border-radius: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
         }
 
         .road-cell:hover {
@@ -387,12 +541,16 @@
             z-index: 10;
             box-shadow: 
                 0 20px 40px rgba(0, 0, 0, 0.4),
-                0 0 30px rgba(255, 215, 0, 0.3),
+                0 0 30px rgba(255, 255, 255, 0.2),
                 inset 0 0 20px rgba(255, 255, 255, 0.1);
         }
 
         .road-cell:hover::before {
             transform: translateX(100%);
+        }
+
+        .road-cell:hover::after {
+            opacity: 1;
         }
 
         .road-cell:active {
@@ -526,10 +684,50 @@
             font-family: 'Orbitron', monospace;
             color: var(--gold);
             font-weight: 700;
+            font-size: 1.1rem;
+            text-align: center;
         }
 
         .loading.active {
             display: block;
+            animation: loadingPulse 1.5s ease-in-out infinite;
+        }
+
+        .loading::before {
+            content: '';
+            display: block;
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 10px;
+            border: 3px solid transparent;
+            border-top: 3px solid var(--gold);
+            border-radius: 50%;
+            animation: loadingSpin 1s linear infinite;
+        }
+
+        .loading::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            margin: 10px auto 0;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            animation: loadingBar 1.5s ease-in-out infinite;
+        }
+
+        @keyframes loadingPulse {
+            0%, 100% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+        }
+
+        @keyframes loadingSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes loadingBar {
+            0%, 100% { transform: scaleX(0.3); }
+            50% { transform: scaleX(1); }
         }
 
 
@@ -689,32 +887,87 @@
             height: 100%;
             pointer-events: none;
             z-index: -1;
+            overflow: hidden;
         }
 
         .particle {
             position: absolute;
-            width: 2px;
-            height: 2px;
-            background: var(--gold);
             border-radius: 50%;
             animation: float 6s infinite linear;
             opacity: 0.3;
         }
 
+        .particle:nth-child(odd) {
+            width: 2px;
+            height: 2px;
+            background: var(--gold);
+        }
+
+        .particle:nth-child(even) {
+            width: 3px;
+            height: 3px;
+            background: radial-gradient(circle, var(--banker-color), transparent);
+        }
+
+        .particle:nth-child(3n) {
+            width: 1px;
+            height: 1px;
+            background: var(--player-color);
+            animation-duration: 8s;
+        }
+
+        .particle:nth-child(4n) {
+            width: 4px;
+            height: 4px;
+            background: radial-gradient(circle, var(--tie-color), transparent);
+            animation-duration: 10s;
+        }
+
         @keyframes float {
             0% {
-                transform: translateY(100vh) rotate(0deg);
+                transform: translateY(100vh) rotate(0deg) scale(0);
                 opacity: 0;
             }
             10% {
                 opacity: 0.3;
+                transform: translateY(90vh) rotate(36deg) scale(1);
             }
             90% {
                 opacity: 0.3;
+                transform: translateY(10vh) rotate(324deg) scale(1);
             }
             100% {
-                transform: translateY(-10px) rotate(360deg);
+                transform: translateY(-10px) rotate(360deg) scale(0);
                 opacity: 0;
+            }
+        }
+
+        /* Floating orbs */
+        .floating-orb {
+            position: fixed;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 215, 0, 0.3), transparent);
+            animation: floatOrb 12s ease-in-out infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes floatOrb {
+            0%, 100% {
+                transform: translateY(0px) translateX(0px) scale(1);
+                opacity: 0.3;
+            }
+            25% {
+                transform: translateY(-20px) translateX(15px) scale(1.1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: translateY(-10px) translateX(-10px) scale(0.9);
+                opacity: 0.4;
+            }
+            75% {
+                transform: translateY(-30px) translateX(20px) scale(1.2);
+                opacity: 0.6;
             }
         }
     </style>
@@ -730,7 +983,7 @@
                 <div class="app-title">
                     <div class="title-icon">🎰</div>
                     <div class="title-text">
-                        <h1>BACCARAT BIG ROAD</h1>
+                        <h1 data-text="BACCARAT BIG ROAD">BACCARAT BIG ROAD</h1>
                         <p>Premium Casino Experience</p>
                     </div>
                 </div>
@@ -814,13 +1067,28 @@
         // Create particle effects
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
-            for (let i = 0; i < 20; i++) {
+            
+            // Create floating particles
+            for (let i = 0; i < 30; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'particle';
                 particle.style.left = Math.random() * 100 + '%';
                 particle.style.animationDelay = Math.random() * 6 + 's';
-                particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                particle.style.animationDuration = (Math.random() * 4 + 4) + 's';
                 particlesContainer.appendChild(particle);
+            }
+
+            // Create floating orbs
+            for (let i = 0; i < 5; i++) {
+                const orb = document.createElement('div');
+                orb.className = 'floating-orb';
+                orb.style.width = (Math.random() * 100 + 50) + 'px';
+                orb.style.height = orb.style.width;
+                orb.style.left = Math.random() * 100 + '%';
+                orb.style.top = Math.random() * 100 + '%';
+                orb.style.animationDelay = Math.random() * 12 + 's';
+                orb.style.animationDuration = (Math.random() * 8 + 10) + 's';
+                particlesContainer.appendChild(orb);
             }
         }
 
