@@ -1140,67 +1140,9 @@
             }
         }
 
-        /* New cell appearance animation */
-        .cell-appear {
-            animation: cellAppear 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
 
-        @keyframes cellAppear {
-            0% {
-                transform: scale(0) rotateY(180deg) rotateX(90deg);
-                opacity: 0;
-            }
-            50% {
-                transform: scale(1.2) rotateY(90deg) rotateX(45deg);
-                opacity: 0.7;
-            }
-            100% {
-                transform: scale(1) rotateY(0deg) rotateX(0deg);
-                opacity: 1;
-            }
-        }
 
-        /* Pulse effect for new cells */
-        .cell-pulse {
-            animation: cellPulse 1s ease-in-out;
-        }
 
-        @keyframes cellPulse {
-            0%, 100% {
-                transform: scale(1);
-                box-shadow: 
-                    0 8px 25px rgba(255, 215, 0, 0.3),
-                    0 0 30px rgba(255, 215, 0, 0.2);
-            }
-            50% {
-                transform: scale(1.1);
-                box-shadow: 
-                    0 15px 40px rgba(255, 215, 0, 0.6),
-                    0 0 50px rgba(255, 215, 0, 0.4);
-            }
-        }
-
-        /* Particle Effects */
-        .particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: var(--gold);
-            border-radius: 50%;
-            pointer-events: none;
-            animation: float 3s infinite ease-in-out;
-        }
-
-        @keyframes float {
-            0%, 100% { 
-                transform: translateY(0) scale(0.5);
-                opacity: 0;
-            }
-            50% { 
-                transform: translateY(-20px) scale(1);
-                opacity: 1;
-            }
-        }
 
         /* Particle Effects */
         .particles {
@@ -1437,51 +1379,30 @@
                     cell.className = 'road-cell empty';
                     cell.dataset.row = row;
                     cell.dataset.col = col;
-                    cell.addEventListener('mouseenter', () => {
-                        if (!cell.classList.contains('empty')) {
-                            cell.style.transform = 'scale(1.1)';
-                        }
-                    });
-                    cell.addEventListener('mouseleave', () => {
-                        cell.style.transform = 'scale(1)';
-                    });
                     grid.appendChild(cell);
                 }
             }
         }
 
-        // Add a new game result with animation
+        // Add a new game result
         function addResult(result) {
             gameHistory.push(result);
-            showLoading();
+            updateDisplay();
+            autoScrollToLatest();
             
-            setTimeout(() => {
-                updateDisplay();
-                autoScrollToLatest();
-                hideLoading();
-                
-                // Add visual feedback
-                const buttons = document.querySelectorAll('.game-btn');
-                buttons.forEach(btn => {
-                    if (btn.classList.contains(result.toLowerCase() === 'b' ? 'banker' : result.toLowerCase() === 'p' ? 'player' : 'tie')) {
-                        btn.style.transform = 'scale(0.95)';
-                        setTimeout(() => {
-                            btn.style.transform = 'scale(1)';
-                        }, 150);
-                    }
-                });
-            }, 100);
+            // Add visual feedback
+            const buttons = document.querySelectorAll('.game-btn');
+            buttons.forEach(btn => {
+                if (btn.classList.contains(result.toLowerCase() === 'b' ? 'banker' : result.toLowerCase() === 'p' ? 'player' : 'tie')) {
+                    btn.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        btn.style.transform = 'scale(1)';
+                    }, 150);
+                }
+            });
         }
 
-        // Show loading animation
-        function showLoading() {
-            document.getElementById('loading').classList.add('active');
-        }
 
-        // Hide loading animation
-        function hideLoading() {
-            document.getElementById('loading').classList.remove('active');
-        }
 
         // Undo the last result
         function undoLast() {
@@ -1497,12 +1418,6 @@
             
             gameHistory = [];
             updateDisplay();
-            
-            // Reset animation
-            const cells = document.querySelectorAll('.road-cell');
-            cells.forEach(cell => {
-                cell.style.animation = 'fadeIn 0.3s ease-in-out';
-            });
         }
 
         // Update the entire display
@@ -1511,7 +1426,7 @@
             updateBigRoad();
         }
 
-        // Update statistics with smooth transitions
+        // Update statistics
         function updateStats() {
             const stats = {
                 B: gameHistory.filter(r => r === 'B').length,
@@ -1519,27 +1434,12 @@
                 T: gameHistory.filter(r => r === 'T').length
             };
             
-            animateCounterUpdate('banker-count', stats.B);
-            animateCounterUpdate('player-count', stats.P);
-            animateCounterUpdate('tie-count', stats.T);
+            document.getElementById('banker-count').textContent = stats.B;
+            document.getElementById('player-count').textContent = stats.P;
+            document.getElementById('tie-count').textContent = stats.T;
         }
 
-        // Animate counter updates
-        function animateCounterUpdate(elementId, newValue) {
-            const element = document.getElementById(elementId);
-            const currentValue = parseInt(element.textContent) || 0;
-            
-            if (currentValue !== newValue) {
-                element.style.transform = 'scale(1.2)';
-                element.style.color = 'var(--gold)';
-                
-                setTimeout(() => {
-                    element.textContent = newValue;
-                    element.style.transform = 'scale(1)';
-                    element.style.color = '';
-                }, 150);
-            }
-        }
+
 
         // Update Big Road display
         function updateBigRoad() {
@@ -1641,7 +1541,7 @@
                 currentCol++;
             });
 
-            // Render the matrix to DOM with animations
+            // Render the matrix to DOM
             for (let row = 0; row < ROWS; row++) {
                 for (let col = 0; col < COLS; col++) {
                     const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
@@ -1650,20 +1550,6 @@
                     if (value) {
                         cell.classList.add(value === 'B' ? 'banker' : 'player');
                         cell.textContent = value;
-                        cell.classList.add('cell-appear');
-                        
-                        // Add pulse effect for the latest cell
-                        setTimeout(() => {
-                            cell.classList.add('cell-pulse');
-                            setTimeout(() => {
-                                cell.classList.remove('cell-pulse');
-                            }, 1000);
-                        }, 600);
-                        
-                        // Remove appear animation class after completion
-                        setTimeout(() => {
-                            cell.classList.remove('cell-appear');
-                        }, 800);
                     }
                 }
             }
@@ -1723,14 +1609,14 @@
                             let dragonCol = currentCol + 1;
                             
                             for (let j = i; j < streak.length; j++) {
-                                while (nextCol < COLS && usedPositions.has(`${nextRow},${nextCol}`)) {
-                                    nextCol++;
+                                while (dragonCol < COLS && usedPositions.has(`${dragonRow},${dragonCol}`)) {
+                                    dragonCol++;
                                 }
                                 
-                                if (nextCol < COLS) {
-                                    cellPositions.push({ row: nextRow, col: nextCol });
-                                    usedPositions.add(`${nextRow},${nextCol}`);
-                                    nextCol++;
+                                if (dragonCol < COLS) {
+                                    cellPositions.push({ row: dragonRow, col: dragonCol });
+                                    usedPositions.add(`${dragonRow},${dragonCol}`);
+                                    dragonCol++;
                                 }
                             }
                         }
