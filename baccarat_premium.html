@@ -98,22 +98,7 @@
             animation: headerGlow 3s ease-in-out infinite alternate;
         }
 
-        .app-header::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(from 0deg, transparent, rgba(255, 215, 0, 0.1), transparent, rgba(255, 71, 87, 0.1), transparent);
-            animation: headerRotate 20s linear infinite;
-            z-index: -1;
-        }
-
-        @keyframes headerRotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        /* Removed rotating gradient background */
 
         @keyframes headerGlow {
             0% { opacity: 0.5; }
