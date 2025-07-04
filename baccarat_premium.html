@@ -318,6 +318,8 @@
             overflow-y: hidden;
             scrollbar-width: thin;
             scrollbar-color: var(--gold) var(--secondary-bg);
+            perspective: 1200px;
+            transform-style: preserve-3d;
         }
 
         .road-grid-container::-webkit-scrollbar {
@@ -340,12 +342,18 @@
             grid-template-columns: repeat(50, 45px);
             gap: 2px;
             min-width: 2350px;
+            transform-style: preserve-3d;
+            transition: transform 0.3s ease;
+        }
+
+        .road-grid-container:hover .big-road-grid {
+            transform: rotateX(2deg) rotateY(1deg);
         }
 
         .road-cell {
             background: var(--secondary-bg);
             border: 2px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -354,42 +362,128 @@
             font-weight: 700;
             color: white;
             position: relative;
-            transition: all 0.2s ease;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            overflow: hidden;
+        }
+
+        .road-cell::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+            z-index: 1;
         }
 
         .road-cell:hover {
-            transform: scale(1.05);
+            transform: translateY(-8px) rotateX(15deg) rotateY(5deg) scale(1.08);
             z-index: 10;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                0 0 30px rgba(255, 215, 0, 0.3),
+                inset 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+
+        .road-cell:hover::before {
+            transform: translateX(100%);
+        }
+
+        .road-cell:active {
+            transform: translateY(-4px) rotateX(10deg) scale(1.05);
+            transition: all 0.1s ease;
         }
 
         .road-cell.banker {
             background: linear-gradient(135deg, #ff1744, #ff5722, #ff8a65);
-            border: 4px solid #fff;
+            border: 3px solid #fff;
             box-shadow: 
-                0 0 30px rgba(255, 23, 68, 0.8),
-                inset 0 0 25px rgba(255, 255, 255, 0.4),
-                0 0 8px rgba(0, 0, 0, 0.9);
+                0 8px 25px rgba(255, 23, 68, 0.6),
+                0 0 30px rgba(255, 23, 68, 0.4),
+                inset 0 0 25px rgba(255, 255, 255, 0.2),
+                inset 0 0 50px rgba(255, 87, 34, 0.3);
             color: white;
             font-weight: 900;
-            text-shadow: 0 3px 6px rgba(0, 0, 0, 0.8);
+            text-shadow: 0 3px 8px rgba(0, 0, 0, 0.8);
+            animation: bankerGlow 3s ease-in-out infinite alternate;
+        }
+
+        .road-cell.banker:hover {
+            box-shadow: 
+                0 25px 50px rgba(255, 23, 68, 0.8),
+                0 0 60px rgba(255, 23, 68, 0.6),
+                inset 0 0 30px rgba(255, 255, 255, 0.3),
+                inset 0 0 60px rgba(255, 87, 34, 0.4);
+            transform: translateY(-12px) rotateX(20deg) rotateY(8deg) scale(1.12);
         }
 
         .road-cell.player {
             background: linear-gradient(135deg, #2196f3, #03a9f4, #4fc3f7);
-            border: 4px solid #fff;
+            border: 3px solid #fff;
             box-shadow: 
-                0 0 30px rgba(33, 150, 243, 0.8),
-                inset 0 0 25px rgba(255, 255, 255, 0.4),
-                0 0 8px rgba(0, 0, 0, 0.9);
+                0 8px 25px rgba(33, 150, 243, 0.6),
+                0 0 30px rgba(33, 150, 243, 0.4),
+                inset 0 0 25px rgba(255, 255, 255, 0.2),
+                inset 0 0 50px rgba(3, 169, 244, 0.3);
             color: white;
             font-weight: 900;
-            text-shadow: 0 3px 6px rgba(0, 0, 0, 0.8);
+            text-shadow: 0 3px 8px rgba(0, 0, 0, 0.8);
+            animation: playerGlow 3s ease-in-out infinite alternate;
+        }
+
+        .road-cell.player:hover {
+            box-shadow: 
+                0 25px 50px rgba(33, 150, 243, 0.8),
+                0 0 60px rgba(33, 150, 243, 0.6),
+                inset 0 0 30px rgba(255, 255, 255, 0.3),
+                inset 0 0 60px rgba(3, 169, 244, 0.4);
+            transform: translateY(-12px) rotateX(20deg) rotateY(-8deg) scale(1.12);
         }
 
         .road-cell.empty {
             background: var(--secondary-bg);
             border-color: var(--border-color);
+        }
+
+        .road-cell.empty:hover {
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes bankerGlow {
+            0% { 
+                box-shadow: 
+                    0 8px 25px rgba(255, 23, 68, 0.6),
+                    0 0 30px rgba(255, 23, 68, 0.4),
+                    inset 0 0 25px rgba(255, 255, 255, 0.2);
+            }
+            100% { 
+                box-shadow: 
+                    0 8px 25px rgba(255, 23, 68, 0.8),
+                    0 0 40px rgba(255, 23, 68, 0.6),
+                    inset 0 0 35px rgba(255, 255, 255, 0.3);
+            }
+        }
+
+        @keyframes playerGlow {
+            0% { 
+                box-shadow: 
+                    0 8px 25px rgba(33, 150, 243, 0.6),
+                    0 0 30px rgba(33, 150, 243, 0.4),
+                    inset 0 0 25px rgba(255, 255, 255, 0.2);
+            }
+            100% { 
+                box-shadow: 
+                    0 8px 25px rgba(33, 150, 243, 0.8),
+                    0 0 40px rgba(33, 150, 243, 0.6),
+                    inset 0 0 35px rgba(255, 255, 255, 0.3);
+            }
         }
 
 
@@ -404,22 +498,80 @@
             font-size: 11px;
             font-weight: 900;
             border-radius: 50%;
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 100;
             border: 2px solid #fff;
             box-shadow: 
-                0 3px 10px rgba(0, 0, 0, 0.4),
-                inset 0 0 8px rgba(255, 255, 255, 0.3);
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+                0 5px 15px rgba(0, 0, 0, 0.4),
+                0 0 20px rgba(5, 150, 105, 0.6),
+                inset 0 0 10px rgba(255, 255, 255, 0.3);
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+            animation: tieAppear 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .tie-indicator:hover {
+            transform: translateY(-2px) scale(1.1) rotateY(15deg);
+            box-shadow: 
+                0 8px 20px rgba(0, 0, 0, 0.5),
+                0 0 30px rgba(5, 150, 105, 0.8),
+                inset 0 0 15px rgba(255, 255, 255, 0.4);
         }
 
         .tie-indicator.multiple {
             background: linear-gradient(135deg, #dc2626, #ef4444, #f87171);
-            transform: scale(1.1);
+            transform: scale(1.2);
+            box-shadow: 
+                0 6px 18px rgba(0, 0, 0, 0.4),
+                0 0 25px rgba(220, 38, 38, 0.7),
+                inset 0 0 12px rgba(255, 255, 255, 0.3);
+            animation: tieMultiple 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .tie-indicator.multiple:hover {
+            transform: translateY(-3px) scale(1.3) rotateY(20deg);
+            box-shadow: 
+                0 10px 25px rgba(0, 0, 0, 0.6),
+                0 0 35px rgba(220, 38, 38, 0.9),
+                inset 0 0 18px rgba(255, 255, 255, 0.4);
+        }
+
+        @keyframes tieAppear {
+            0% {
+                transform: scale(0) rotateY(180deg);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.3) rotateY(90deg);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(1) rotateY(0deg);
+                opacity: 1;
+            }
+        }
+
+        @keyframes tieMultiple {
+            0% {
+                transform: scale(1) rotateZ(0deg);
+            }
+            25% {
+                transform: scale(1.4) rotateZ(90deg);
+            }
+            50% {
+                transform: scale(1.1) rotateZ(180deg);
+            }
+            75% {
+                transform: scale(1.3) rotateZ(270deg);
+            }
+            100% {
+                transform: scale(1.2) rotateZ(360deg);
+            }
         }
 
         /* Loading Animation */
@@ -506,12 +658,62 @@
         }
 
         .slide-in {
-            animation: slideIn 0.3s ease-out;
+            animation: slideIn3D 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        @keyframes slideIn {
-            from { transform: translateX(-20px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+        @keyframes slideIn3D {
+            0% { 
+                transform: translateX(-50px) translateY(20px) rotateY(-90deg) scale(0.3);
+                opacity: 0;
+            }
+            50% {
+                transform: translateX(-10px) translateY(-5px) rotateY(-20deg) scale(1.1);
+                opacity: 0.8;
+            }
+            100% { 
+                transform: translateX(0) translateY(0) rotateY(0deg) scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* New cell appearance animation */
+        .cell-appear {
+            animation: cellAppear 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes cellAppear {
+            0% {
+                transform: scale(0) rotateY(180deg) rotateX(90deg);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2) rotateY(90deg) rotateX(45deg);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(1) rotateY(0deg) rotateX(0deg);
+                opacity: 1;
+            }
+        }
+
+        /* Pulse effect for new cells */
+        .cell-pulse {
+            animation: cellPulse 1s ease-in-out;
+        }
+
+        @keyframes cellPulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 
+                    0 8px 25px rgba(255, 215, 0, 0.3),
+                    0 0 30px rgba(255, 215, 0, 0.2);
+            }
+            50% {
+                transform: scale(1.1);
+                box-shadow: 
+                    0 15px 40px rgba(255, 215, 0, 0.6),
+                    0 0 50px rgba(255, 215, 0, 0.4);
+            }
         }
 
         /* Particle Effects */
@@ -745,20 +947,18 @@
             }
         }
 
-        // Clear all results with confirmation
+        // Clear all results
         function clearAll() {
             if (gameHistory.length === 0) return;
             
-            if (confirm('🎰 Are you sure you want to clear all game data?')) {
-                gameHistory = [];
-                updateDisplay();
-                
-                // Reset animation
-                const cells = document.querySelectorAll('.road-cell');
-                cells.forEach(cell => {
-                    cell.style.animation = 'fadeIn 0.3s ease-in-out';
-                });
-            }
+            gameHistory = [];
+            updateDisplay();
+            
+            // Reset animation
+            const cells = document.querySelectorAll('.road-cell');
+            cells.forEach(cell => {
+                cell.style.animation = 'fadeIn 0.3s ease-in-out';
+            });
         }
 
         // Update the entire display
@@ -906,7 +1106,20 @@
                     if (value) {
                         cell.classList.add(value === 'B' ? 'banker' : 'player');
                         cell.textContent = value;
-                        cell.classList.add('slide-in');
+                        cell.classList.add('cell-appear');
+                        
+                        // Add pulse effect for the latest cell
+                        setTimeout(() => {
+                            cell.classList.add('cell-pulse');
+                            setTimeout(() => {
+                                cell.classList.remove('cell-pulse');
+                            }, 1000);
+                        }, 600);
+                        
+                        // Remove appear animation class after completion
+                        setTimeout(() => {
+                            cell.classList.remove('cell-appear');
+                        }, 800);
                     }
                 }
             }
