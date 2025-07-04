@@ -912,31 +912,6 @@
         .prediction-item {
             background: var(--secondary-bg);
             border: 2px solid var(--border-color);
-            border-radius: 10px;
-            padding: 12px;
-            text-align: left;
-            font-family: 'Orbitron', monospace;
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            position: relative;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            min-height: 60px;
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            align-items: center;
-            overflow: hidden;
-            margin-bottom: 4px;
-            width: 100%;
-            box-sizing: border-box;
-            animation: slideInHistory 0.5s ease-out forwards;
-        }
-
-        .prediction-item {
-            background: var(--secondary-bg);
-            border: 2px solid var(--border-color);
             border-radius: 16px;
             padding: 16px;
             text-align: left;
@@ -998,6 +973,17 @@
 
         .prediction-item.wrong:hover {
             box-shadow: 0 6px 25px rgba(239, 68, 68, 0.5);
+        }
+
+        .prediction-item.tie {
+            background: linear-gradient(135deg, #059669, #10b981);
+            border-color: #34d399;
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .prediction-item.tie:hover {
+            box-shadow: 0 6px 25px rgba(16, 185, 129, 0.5);
         }
 
         .prediction-item.pending {
@@ -1160,26 +1146,6 @@
             gap: 2px;
             min-width: 2350px;
             transition: transform 0.3s ease;
-        }
-
-        .road-cell {
-            background: var(--secondary-bg);
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Orbitron', monospace;
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: white;
-            position: relative;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: pointer;
-            transform-style: preserve-3d;
-            perspective: 1000px;
-            overflow: hidden;
-            will-change: transform;
         }
 
         .road-cell {
@@ -1711,7 +1677,7 @@
                 <div class="prediction-history-header">
                     <div class="prediction-history-title">📊 Prediction History</div>
                     <div class="prediction-history-stats" id="prediction-history-stats">
-                        <span id="history-correct">0</span> correct | <span id="history-wrong">0</span> wrong | <span id="history-pending">0</span> pending
+                        <span id="history-correct">0</span> correct | <span id="history-wrong">0</span> wrong | <span id="history-tie">0</span> ties | <span id="history-pending">0</span> pending
                     </div>
                 </div>
                 <div class="prediction-history-grid" id="prediction-history-grid">
@@ -1799,7 +1765,19 @@
             // Check prediction accuracy if we have a previous prediction
             if (predictions.length > 0) {
                 const lastPrediction = predictions[predictions.length - 1];
-                if (lastPrediction.predicted !== 'T' && result !== 'T') {
+                
+                // Handle TIE result - mark prediction as 'tie' status
+                if (result === 'T') {
+                    // Update prediction history status for TIE
+                    if (predictionHistory.length > 0) {
+                        const lastHistoryItem = predictionHistory[predictionHistory.length - 1];
+                        if (lastHistoryItem.status === 'pending') {
+                            lastHistoryItem.status = 'tie';
+                            lastHistoryItem.actual = result;
+                        }
+                    }
+                } else if (lastPrediction.predicted !== 'T') {
+                    // Normal B/P prediction vs B/P result
                     predictionAccuracy.total++;
                     
                     const isCorrect = lastPrediction.predicted === result;
@@ -1951,6 +1929,7 @@
             let correctCount = 0;
             let wrongCount = 0;
             let pendingCount = 0;
+            let tieCount = 0;
             
             // Create fragments for better performance
             const fragment = document.createDocumentFragment();
@@ -1973,6 +1952,10 @@
                     statusClass = 'wrong';
                     statusIcon = '❌';
                     wrongCount++;
+                } else if (item.status === 'tie') {
+                    statusClass = 'tie';
+                    statusIcon = '🤝';
+                    tieCount++;
                 } else {
                     statusClass = 'pending';
                     statusIcon = '⏳';
@@ -1982,7 +1965,10 @@
                 predictionItem.classList.add(statusClass);
                 
                 const predictionText = item.predicted === 'B' ? 'BANKER' : 'PLAYER';
-                const actualText = item.actual ? (item.actual === 'B' ? 'BANKER' : 'PLAYER') : 'PENDING';
+                let actualText = 'PENDING';
+                if (item.actual === 'B') actualText = 'BANKER';
+                else if (item.actual === 'P') actualText = 'PLAYER';
+                else if (item.actual === 'T') actualText = 'TIE';
                 
                 predictionItem.innerHTML = `
                     <div class="prediction-text">${statusIcon} ${predictionText}</div>
@@ -2000,9 +1986,10 @@
             
             historyGrid.appendChild(fragment);
             
-            // Update statistics
+            // Update statistics - include ties
             historyCorrect.textContent = correctCount;
             historyWrong.textContent = wrongCount;
+            document.getElementById('history-tie').textContent = tieCount;
             historyPending.textContent = pendingCount;
             
             // Auto-scroll to top to show latest predictions

@@ -1287,6 +1287,26 @@ class BaccaratAIPredictor {
             trend: trend
         };
     }
+
+    // Reset all AI data
+    reset() {
+        // Reset all tracking variables
+        this.recentPerformance = [];
+        this.patternHistory = [];
+        this.methodSuccessRates = {};
+        this.neuralWeights.clear();
+        this.sequenceMemory.clear();
+        
+        // Reset adaptive weights to default
+        Object.keys(this.adaptiveWeights).forEach(key => {
+            this.adaptiveWeights[key] = 1.0;
+        });
+        
+        // Reinitialize neural weights
+        this.initializeNeuralWeights();
+        
+        console.log('🔄 AI Predictor has been reset to initial state');
+    }
 }
 
 // Export for use in main application
