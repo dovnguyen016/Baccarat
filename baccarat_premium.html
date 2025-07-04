@@ -161,13 +161,337 @@
         }
 
         .title-icon {
-            font-size: 2.5rem;
-            animation: rotate 10s linear infinite;
+            position: relative;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: iconFloat 4s ease-in-out infinite;
         }
 
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-3px) scale(1.05); }
+        }
+
+        /* Beautiful Rocket Icon with Modern Effects */
+        .rocket-icon {
+            position: relative;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: rocketFloat 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.6));
+        }
+
+        @keyframes rocketFloat {
+            0%, 100% { transform: translateY(0px) rotate(-2deg); }
+            50% { transform: translateY(-8px) rotate(2deg); }
+        }
+
+        /* Rocket body with gradient and glow */
+        .rocket-body {
+            position: absolute;
+            width: 18px;
+            height: 32px;
+            background: linear-gradient(135deg, 
+                #FFD700 0%, 
+                #FFF 15%, 
+                #FFD700 30%, 
+                #FF6B35 45%, 
+                #FFD700 60%, 
+                #FFF 75%, 
+                #FFD700 90%, 
+                #FFF 100%);
+            border-radius: 10px 10px 4px 4px;
+            box-shadow: 
+                0 0 25px rgba(255, 215, 0, 0.9),
+                0 0 40px rgba(255, 107, 53, 0.6),
+                inset 0 0 15px rgba(255, 255, 255, 0.5),
+                inset 0 0 8px rgba(255, 165, 0, 0.7),
+                0 0 60px rgba(255, 215, 0, 0.4);
+            animation: rocketPulse 2.5s ease-in-out infinite;
+            z-index: 3;
+            position: relative;
+        }
+        
+        /* Rocket body shine effect */
+        .rocket-body::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 3px;
+            height: 20px;
+            background: linear-gradient(to bottom, 
+                rgba(255, 255, 255, 0.8), 
+                transparent);
+            border-radius: 2px;
+            animation: bodyShine 3s ease-in-out infinite;
+        }
+        
+        @keyframes bodyShine {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes rocketPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Rocket window */
+        .rocket-body::before {
+            content: '';
+            position: absolute;
+            top: 7px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 10px;
+            background: linear-gradient(135deg, #4fc3f7 0%, #03a9f4 50%, #0288d1 100%);
+            border-radius: 50%;
+            box-shadow: 
+                0 0 12px rgba(79, 195, 247, 0.9),
+                inset 0 0 6px rgba(255, 255, 255, 0.6);
+            animation: windowGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes windowGlow {
+            0% { box-shadow: 0 0 12px rgba(79, 195, 247, 0.9), inset 0 0 6px rgba(255, 255, 255, 0.6); }
+            100% { box-shadow: 0 0 20px rgba(79, 195, 247, 1), inset 0 0 10px rgba(255, 255, 255, 0.8); }
+        }
+
+        /* Rocket flame with multiple layers */
+        .rocket-flame {
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 14px;
+            height: 22px;
+            background: linear-gradient(to top, 
+                #FF1744 0%, 
+                #FF4569 15%, 
+                #FF6B35 30%, 
+                #FFA500 45%, 
+                #FFD700 60%, 
+                #FFED4E 75%, 
+                #FFF 90%, 
+                rgba(255, 255, 255, 0.9) 100%);
+            border-radius: 0 0 60% 60%;
+            animation: flameFlicker 0.3s ease-in-out infinite alternate;
+            z-index: 2;
+            filter: blur(0.3px);
+            box-shadow: 
+                0 0 15px rgba(255, 107, 53, 0.8),
+                0 0 25px rgba(255, 215, 0, 0.6);
+        }
+
+        @keyframes flameFlicker {
+            0% { 
+                transform: translateX(-50%) scaleY(1) scaleX(1);
+                opacity: 0.95;
+                filter: blur(0.3px) hue-rotate(0deg);
+            }
+            100% { 
+                transform: translateX(-50%) scaleY(1.4) scaleX(1.15);
+                opacity: 1;
+                filter: blur(0.2px) hue-rotate(10deg);
+            }
+        }
+
+        /* Inner flame for more realistic effect */
+        .rocket-flame::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 9px;
+            height: 15px;
+            background: linear-gradient(to top, 
+                #FF4569 0%, 
+                #FF6B35 25%, 
+                #FFA500 50%, 
+                #FFD700 75%, 
+                #FFF 100%);
+            border-radius: 0 0 50% 50%;
+            animation: innerFlame 0.25s ease-in-out infinite alternate;
+        }
+
+        @keyframes innerFlame {
+            0% { 
+                transform: translateX(-50%) scaleY(1);
+                opacity: 0.9;
+            }
+            100% { 
+                transform: translateX(-50%) scaleY(1.3);
+                opacity: 1;
+            }
+        }
+
+        /* Rocket fins with metallic effect */
+        .rocket-fin {
+            position: absolute;
+            bottom: 6px;
+            width: 6px;
+            height: 10px;
+            background: linear-gradient(135deg, 
+                #C0C0C0 0%, 
+                #E8E8E8 25%, 
+                #FFD700 50%, 
+                #E8E8E8 75%, 
+                #C0C0C0 100%);
+            border-radius: 1px;
+            box-shadow: 
+                0 0 8px rgba(192, 192, 192, 0.6),
+                inset 0 0 4px rgba(255, 255, 255, 0.4);
+            z-index: 1;
+        }
+
+        .rocket-fin.left {
+            left: 6px;
+            clip-path: polygon(0 100%, 100% 100%, 100% 0);
+            animation: finGlow 4s ease-in-out infinite;
+        }
+
+        .rocket-fin.right {
+            right: 6px;
+            clip-path: polygon(0 100%, 100% 100%, 0 0);
+            animation: finGlow 4s ease-in-out infinite reverse;
+        }
+
+        @keyframes finGlow {
+            0%, 100% { box-shadow: 0 0 8px rgba(192, 192, 192, 0.6), inset 0 0 4px rgba(255, 255, 255, 0.4); }
+            50% { box-shadow: 0 0 15px rgba(255, 215, 0, 0.8), inset 0 0 8px rgba(255, 255, 255, 0.6); }
+        }
+
+        /* Rocket trail particles with staggered animation */
+        .rocket-particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: radial-gradient(circle, var(--gold) 0%, rgba(255, 107, 53, 0.8) 40%, transparent 80%);
+            border-radius: 50%;
+            animation: particleTrail 1.5s ease-out infinite;
+            opacity: 0.9;
+            box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+        }
+
+        .rocket-particle:nth-child(5) {
+            bottom: -22px;
+            left: 40%;
+            animation-delay: 0s;
+            width: 6px;
+            height: 6px;
+        }
+
+        .rocket-particle:nth-child(6) {
+            bottom: -32px;
+            left: 60%;
+            animation-delay: -0.3s;
+            width: 4px;
+            height: 4px;
+        }
+
+        .rocket-particle:nth-child(7) {
+            bottom: -40px;
+            left: 50%;
+            animation-delay: -0.6s;
+            width: 3px;
+            height: 3px;
+        }
+
+        @keyframes particleTrail {
+            0% { 
+                opacity: 1; 
+                transform: scale(1) translateY(0px);
+                background: radial-gradient(circle, var(--gold) 0%, rgba(255, 107, 53, 0.8) 40%, transparent 80%);
+                box-shadow: 0 0 8px rgba(255, 215, 0, 0.8);
+            }
+            30% { 
+                opacity: 0.8; 
+                transform: scale(0.9) translateY(6px);
+                background: radial-gradient(circle, #FFA500 0%, rgba(255, 107, 53, 0.6) 40%, transparent 80%);
+                box-shadow: 0 0 6px rgba(255, 165, 0, 0.6);
+            }
+            70% { 
+                opacity: 0.4; 
+                transform: scale(0.6) translateY(15px);
+                background: radial-gradient(circle, #FF6B35 0%, rgba(255, 71, 87, 0.4) 40%, transparent 80%);
+                box-shadow: 0 0 4px rgba(255, 107, 53, 0.4);
+            }
+            100% { 
+                opacity: 0; 
+                transform: scale(0.2) translateY(25px);
+                background: radial-gradient(circle, #ff6b7a 0%, transparent 60%);
+                box-shadow: 0 0 2px rgba(255, 107, 122, 0.2);
+            }
+        }
+
+        /* Additional rocket glow effect */
+        .rocket-icon::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70px;
+            height: 70px;
+            background: radial-gradient(circle, 
+                rgba(255, 215, 0, 0.3) 0%, 
+                rgba(255, 107, 53, 0.2) 30%, 
+                rgba(255, 215, 0, 0.15) 60%, 
+                transparent 80%);
+            border-radius: 50%;
+            animation: auraGlow 4s ease-in-out infinite alternate;
+            z-index: 0;
+        }
+
+        /* Extra outer glow ring */
+        .rocket-icon::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 55px;
+            height: 55px;
+            border: 2px solid rgba(255, 215, 0, 0.4);
+            border-radius: 50%;
+            border-top-color: rgba(255, 215, 0, 0.8);
+            border-right-color: rgba(255, 107, 53, 0.6);
+            animation: outerRing 3s linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes outerRing {
+            0% { 
+                transform: translate(-50%, -50%) rotate(0deg);
+                opacity: 0.6;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% { 
+                transform: translate(-50%, -50%) rotate(360deg);
+                opacity: 0.6;
+            }
+        }
+
+        @keyframes auraGlow {
+            0% { 
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.4;
+            }
+            100% { 
+                transform: translate(-50%, -50%) scale(1.3);
+                opacity: 0.8;
+            }
         }
 
         .title-text h1 {
@@ -981,7 +1305,17 @@
         <header class="app-header fade-in">
             <div class="header-content">
                 <div class="app-title">
-                    <div class="title-icon">🎰</div>
+                    <div class="title-icon">
+                        <div class="rocket-icon">
+                            <div class="rocket-body"></div>
+                            <div class="rocket-flame"></div>
+                            <div class="rocket-fin left"></div>
+                            <div class="rocket-fin right"></div>
+                            <div class="rocket-particle"></div>
+                            <div class="rocket-particle"></div>
+                            <div class="rocket-particle"></div>
+                        </div>
+                    </div>
                     <div class="title-text">
                         <h1 data-text="BACCARAT PREDICTOR">BACCARAT PREDICTOR</h1>
                         <p>Premium Casino Experience</p>
