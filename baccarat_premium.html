@@ -205,8 +205,8 @@
         }
 
         @keyframes windowGlow {
-            0% { box-shadow: 0 0 8px rgba(79, 195, 247, 0.7); }
-            100% { box-shadow: 0 0 12px rgba(79, 195, 247, 0.9); }
+            0% { box-shadow: 0 0 6px rgba(79, 195, 247, 0.5); }
+            100% { box-shadow: 0 0 8px rgba(79, 195, 247, 0.7); }
         }
 
         /* Rocket flame with multiple layers */
@@ -226,7 +226,7 @@
             border-radius: 0 0 60% 60%;
             animation: flameFlicker 0.4s ease-in-out infinite alternate;
             z-index: 2;
-            box-shadow: 0 0 10px rgba(255, 107, 53, 0.6);
+            box-shadow: 0 0 6px rgba(255, 107, 53, 0.4);
         }
 
         @keyframes flameFlicker {
@@ -279,7 +279,7 @@
                 #FFD700 50%, 
                 #C0C0C0 100%);
             border-radius: 1px;
-            box-shadow: 0 0 6px rgba(192, 192, 192, 0.5);
+            box-shadow: 0 0 3px rgba(192, 192, 192, 0.3);
             z-index: 1;
         }
 
@@ -296,8 +296,8 @@
         }
 
         @keyframes finGlow {
-            0%, 100% { box-shadow: 0 0 6px rgba(192, 192, 192, 0.5); }
-            50% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.7); }
+            0%, 100% { box-shadow: 0 0 3px rgba(192, 192, 192, 0.3); }
+            50% { box-shadow: 0 0 6px rgba(255, 215, 0, 0.5); }
         }
 
         /* Rocket trail particles with staggered animation */
@@ -309,7 +309,7 @@
             border-radius: 50%;
             animation: particleTrail 2s ease-out infinite;
             opacity: 0.8;
-            box-shadow: 0 0 6px rgba(255, 215, 0, 0.5);
+            box-shadow: 0 0 3px rgba(255, 215, 0, 0.3);
         }
 
         .rocket-particle:nth-child(5) {
@@ -621,12 +621,12 @@
         }
 
         .game-btn:hover {
-            transform: translateY(-3px) rotateX(5deg);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            transform: translateY(-2px) rotateX(3deg);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
         }
 
         .game-btn:active {
-            transform: translateY(-1px) rotateX(2deg) scale(0.99);
+            transform: translateY(-1px) rotateX(1deg) scale(0.98);
             transition: all 0.1s ease;
         }
 
@@ -651,7 +651,7 @@
         .action-btn:hover {
             border-color: var(--gold);
             color: var(--gold);
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.15);
         }
 
         /* Big Road Container */
@@ -1262,7 +1262,7 @@
                 streaks.push(currentStreak);
             }
 
-            // Place streaks on grid
+            // Place streaks on grid with improved dragon tail logic
             let currentCol = 0;
             const usedPositions = new Set();
 
@@ -1273,10 +1273,12 @@
                 let row = 0;
                 let placedCount = 0;
 
+                // Find next available column
                 while (currentCol < COLS && usedPositions.has(`0,${currentCol}`)) {
                     currentCol++;
                 }
 
+                // Place streak vertically first
                 for (let i = 0; i < streak.length && row < ROWS; i++) {
                     const pos = `${row},${currentCol}`;
                     if (!usedPositions.has(pos)) {
@@ -1285,43 +1287,43 @@
                         placedCount++;
                         row++;
                     } else {
-                        // Hit collision - place remaining results horizontally if streak is long enough (7+)
-                        if (streak.length >= 7) {
-                            let nextRow = Math.max(0, row - 1);
-                            let nextCol = currentCol + 1;
-                            
-                            for (let j = i; j < streak.length; j++) {
-                                while (nextCol < COLS && usedPositions.has(`${nextRow},${nextCol}`)) {
-                                    nextCol++;
-                                }
-                                
-                                if (nextCol < COLS) {
-                                    const pos = `${nextRow},${nextCol}`;
-                                    bigRoadMatrix[nextRow][nextCol] = result;
-                                    usedPositions.add(pos);
-                                    nextCol++;
-                                }
-                            }
-                        }
-                        break;
+                        break; // Hit collision
                     }
                 }
 
-                // If we filled the column (no collision, just exceeded 6 rows) and streak is long enough
-                if (placedCount < streak.length && row >= ROWS && streak.length >= 7) {
-                    let nextRow = ROWS - 1;
-                    let nextCol = currentCol + 1;
+                // Handle remaining results if streak is longer than available vertical space
+                if (placedCount < streak.length) {
+                    // Dragon tail: place remaining results horizontally
+                    let dragonRow = Math.min(ROWS - 1, Math.max(0, row - 1)); // Start from last filled row
+                    let dragonCol = currentCol + 1;
                     
                     for (let i = placedCount; i < streak.length; i++) {
-                        while (nextCol < COLS && usedPositions.has(`${nextRow},${nextCol}`)) {
-                            nextCol++;
+                        // Find next available horizontal position
+                        while (dragonCol < COLS && usedPositions.has(`${dragonRow},${dragonCol}`)) {
+                            dragonCol++;
                         }
                         
-                        if (nextCol < COLS) {
-                            const pos = `${nextRow},${nextCol}`;
-                            bigRoadMatrix[nextRow][nextCol] = result;
+                        if (dragonCol < COLS) {
+                            const pos = `${dragonRow},${dragonCol}`;
+                            bigRoadMatrix[dragonRow][dragonCol] = result;
                             usedPositions.add(pos);
-                            nextCol++;
+                            dragonCol++;
+                        } else {
+                            // If we run out of horizontal space, try moving to next row
+                            if (dragonRow < ROWS - 1) {
+                                dragonRow++;
+                                dragonCol = 0;
+                                // Continue placing in next row
+                                while (dragonCol < COLS && usedPositions.has(`${dragonRow},${dragonCol}`)) {
+                                    dragonCol++;
+                                }
+                                if (dragonCol < COLS) {
+                                    const pos = `${dragonRow},${dragonCol}`;
+                                    bigRoadMatrix[dragonRow][dragonCol] = result;
+                                    usedPositions.add(pos);
+                                    dragonCol++;
+                                }
+                            }
                         }
                     }
                 }
