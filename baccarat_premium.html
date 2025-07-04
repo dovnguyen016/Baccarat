@@ -36,8 +36,8 @@
             --card-bg: #1f1f1f;
             --border-color: #333;
             --gold: #FFD700;
-            --banker-color: #ff4757;
-            --player-color: #3742fa;
+            --banker-color: #e74c3c;
+            --player-color: #2980b9;
             --tie-color: #2ed573;
             --text-primary: #ffffff;
             --text-secondary: #b8b8b8;
@@ -122,21 +122,20 @@
             animation: iconFloat 4s ease-in-out infinite;
         }
 
-        @keyframes iconFloat {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-3px) scale(1.05); }
-        }
-
-        @keyframes iconFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-2px); }
-        }   width: 50px;
+        .rocket-icon {
+            position: relative;
+            width: 50px;
             height: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
             animation: rocketFloat 3s ease-in-out infinite;
             filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.6));
+        }
+
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-3px) scale(1.05); }
         }
 
         @keyframes rocketFloat {
@@ -189,6 +188,7 @@
             50% { transform: scale(1.02); }
         }
 
+        /* Rocket window */
         /* Rocket window */
         .rocket-body::before {
             content: '';
@@ -300,7 +300,6 @@
             50% { box-shadow: 0 0 6px rgba(255, 215, 0, 0.5); }
         }
 
-        /* Rocket trail particles with staggered animation */
         .rocket-particle {
             position: absolute;
             width: 4px;
@@ -425,27 +424,9 @@
             position: relative;
         }
 
-        .title-text h1::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 0;
-            left: 0;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            background-size: 200% 100%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: textSweep 2s ease-in-out infinite;
-        }
-
         @keyframes titleShimmer {
             0%, 100% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
-        }
-
-        @keyframes textSweep {
-            0% { background-position: -200% 0%; }
-            100% { background-position: 200% 0%; }
         }
 
         .title-text p {
@@ -562,12 +543,26 @@
             font-weight: 700;
             color: white;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-transform: uppercase;
             letter-spacing: 1px;
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            transform-style: preserve-3d;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .game-btn.banker {
+            background: linear-gradient(135deg, var(--banker-color), #c0392b);
+            box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3);
+        }
+
+        .game-btn.player {
+            background: linear-gradient(135deg, var(--player-color), #1f618d);
+            box-shadow: 0 4px 15px rgba(55, 66, 250, 0.3);
+        }
+
+        .game-btn.tie {
+            background: linear-gradient(135deg, var(--tie-color), #26de81);
+            box-shadow: 0 4px 15px rgba(46, 213, 115, 0.3);
         }
 
         .game-btn::before {
@@ -577,56 +572,22 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.6s ease;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
             z-index: 1;
-        }
-
-        .game-btn::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.3), transparent);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.4s ease, height 0.4s ease;
-            z-index: 0;
         }
 
         .game-btn:hover::before {
             left: 100%;
         }
 
-        .game-btn:hover::after {
-            width: 200px;
-            height: 200px;
-        }
-
-        .game-btn.banker {
-            background: linear-gradient(135deg, var(--banker-color), #ff6b7a);
-            box-shadow: 0 4px 20px rgba(255, 71, 87, 0.4);
-        }
-
-        .game-btn.player {
-            background: linear-gradient(135deg, var(--player-color), #5352ed);
-            box-shadow: 0 4px 20px rgba(55, 66, 250, 0.4);
-        }
-
-        .game-btn.tie {
-            background: linear-gradient(135deg, var(--tie-color), #26de81);
-            box-shadow: 0 4px 20px rgba(46, 213, 115, 0.4);
-        }
-
         .game-btn:hover {
-            transform: translateY(-2px) rotateX(3deg);
-            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
         }
 
         .game-btn:active {
-            transform: translateY(-1px) rotateX(1deg) scale(0.98);
+            transform: translateY(-1px) scale(0.98);
             transition: all 0.1s ease;
         }
 
@@ -697,8 +658,6 @@
             overflow-y: hidden;
             scrollbar-width: thin;
             scrollbar-color: var(--gold) var(--secondary-bg);
-            perspective: 1200px;
-            transform-style: preserve-3d;
         }
 
         .road-grid-container::-webkit-scrollbar {
@@ -721,12 +680,7 @@
             grid-template-columns: repeat(50, 45px);
             gap: 2px;
             min-width: 2350px;
-            transform-style: preserve-3d;
             transition: transform 0.3s ease;
-        }
-
-        .road-grid-container:hover .big-road-grid {
-            transform: rotateX(1deg) rotateY(0.5deg);
         }
 
         .road-cell {
@@ -749,6 +703,24 @@
             will-change: transform;
         }
 
+        .road-cell {
+            background: var(--secondary-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: white;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            overflow: hidden;
+            will-change: transform;
+        }
+
         .road-cell::before {
             content: '';
             position: absolute;
@@ -756,91 +728,25 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.15) 50%, transparent 70%);
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
             transform: translateX(-100%);
-            transition: transform 0.6s ease;
+            transition: transform 0.4s ease;
             z-index: 1;
         }
 
-        .road-cell::after {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            border-radius: 12px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            z-index: -1;
-        }
-
         .road-cell:hover {
-            transform: translateY(-4px) rotateX(8deg) rotateY(3deg) scale(1.05);
+            transform: translateY(-2px) scale(1.03);
             z-index: 10;
-            box-shadow: 
-                0 12px 25px rgba(0, 0, 0, 0.3),
-                0 0 20px rgba(255, 255, 255, 0.15);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
         }
 
         .road-cell:hover::before {
             transform: translateX(100%);
         }
 
-        .road-cell:hover::after {
-            opacity: 1;
-        }
-
         .road-cell:active {
-            transform: translateY(-2px) rotateX(5deg) scale(1.02);
+            transform: translateY(-1px) scale(1.01);
             transition: all 0.1s ease;
-        }
-
-        .road-cell.banker {
-            background: linear-gradient(135deg, #ff1744, #ff5722, #ff8a65);
-            border: 3px solid #fff;
-            box-shadow: 
-                0 8px 25px rgba(255, 23, 68, 0.6),
-                0 0 30px rgba(255, 23, 68, 0.4),
-                inset 0 0 25px rgba(255, 255, 255, 0.2),
-                inset 0 0 50px rgba(255, 87, 34, 0.3);
-            color: white;
-            font-weight: 900;
-            text-shadow: 0 3px 8px rgba(0, 0, 0, 0.8);
-            animation: bankerGlow 3s ease-in-out infinite alternate;
-        }
-
-        .road-cell.banker:hover {
-            box-shadow: 
-                0 25px 50px rgba(255, 23, 68, 0.8),
-                0 0 60px rgba(255, 23, 68, 0.6),
-                inset 0 0 30px rgba(255, 255, 255, 0.3),
-                inset 0 0 60px rgba(255, 87, 34, 0.4);
-            transform: translateY(-12px) rotateX(20deg) rotateY(8deg) scale(1.12);
-        }
-
-        .road-cell.player {
-            background: linear-gradient(135deg, #2196f3, #03a9f4, #4fc3f7);
-            border: 3px solid #fff;
-            box-shadow: 
-                0 8px 25px rgba(33, 150, 243, 0.6),
-                0 0 30px rgba(33, 150, 243, 0.4),
-                inset 0 0 25px rgba(255, 255, 255, 0.2),
-                inset 0 0 50px rgba(3, 169, 244, 0.3);
-            color: white;
-            font-weight: 900;
-            text-shadow: 0 3px 8px rgba(0, 0, 0, 0.8);
-            animation: playerGlow 3s ease-in-out infinite alternate;
-        }
-
-        .road-cell.player:hover {
-            box-shadow: 
-                0 25px 50px rgba(33, 150, 243, 0.8),
-                0 0 60px rgba(33, 150, 243, 0.6),
-                inset 0 0 30px rgba(255, 255, 255, 0.3),
-                inset 0 0 60px rgba(3, 169, 244, 0.4);
-            transform: translateY(-12px) rotateX(20deg) rotateY(-8deg) scale(1.12);
         }
 
         .road-cell.empty {
@@ -849,33 +755,71 @@
         }
 
         .road-cell.empty:hover {
-            transform: translateY(-4px) scale(1.03);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .road-cell.banker {
+            background: linear-gradient(135deg, #e74c3c, #c0392b, #a93226);
+            border: 2px solid #fff;
+            box-shadow: 
+                0 4px 15px rgba(231, 76, 60, 0.5),
+                0 0 20px rgba(231, 76, 60, 0.4);
+            color: white;
+            font-weight: 900;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+            animation: bankerGlow 3s ease-in-out infinite alternate;
+        }
+
+        .road-cell.banker:hover {
+            box-shadow: 
+                0 8px 25px rgba(231, 76, 60, 0.7),
+                0 0 30px rgba(231, 76, 60, 0.5);
+            transform: translateY(-3px) scale(1.05);
+        }
+
+        .road-cell.player {
+            background: linear-gradient(135deg, #2980b9, #1f618d, #1b4f72);
+            border: 2px solid #fff;
+            box-shadow: 
+                0 4px 15px rgba(41, 128, 185, 0.5),
+                0 0 20px rgba(41, 128, 185, 0.4);
+            color: white;
+            font-weight: 900;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+            animation: playerGlow 3s ease-in-out infinite alternate;
+        }
+
+        .road-cell.player:hover {
+            box-shadow: 
+                0 8px 25px rgba(41, 128, 185, 0.7),
+                0 0 30px rgba(41, 128, 185, 0.5);
+            transform: translateY(-3px) scale(1.05);
         }
 
         @keyframes bankerGlow {
             0% { 
                 box-shadow: 
-                    0 6px 20px rgba(255, 23, 68, 0.5),
-                    0 0 25px rgba(255, 23, 68, 0.3);
+                    0 4px 15px rgba(231, 76, 60, 0.4),
+                    0 0 20px rgba(231, 76, 60, 0.3);
             }
             100% { 
                 box-shadow: 
-                    0 8px 25px rgba(255, 23, 68, 0.7),
-                    0 0 35px rgba(255, 23, 68, 0.5);
+                    0 6px 20px rgba(231, 76, 60, 0.6),
+                    0 0 25px rgba(231, 76, 60, 0.5);
             }
         }
 
         @keyframes playerGlow {
             0% { 
                 box-shadow: 
-                    0 6px 20px rgba(33, 150, 243, 0.5),
-                    0 0 25px rgba(33, 150, 243, 0.3);
+                    0 4px 15px rgba(41, 128, 185, 0.4),
+                    0 0 20px rgba(41, 128, 185, 0.3);
             }
             100% { 
                 box-shadow: 
-                    0 8px 25px rgba(33, 150, 243, 0.7),
-                    0 0 35px rgba(33, 150, 243, 0.5);
+                    0 6px 20px rgba(41, 128, 185, 0.6),
+                    0 0 25px rgba(41, 128, 185, 0.5);
             }
         }
 
@@ -902,8 +846,9 @@
         }
 
         .tie-indicator.multiple {
-            background: linear-gradient(135deg, #dc2626, #ef4444);
+            background: linear-gradient(135deg, #059669, #10b981);
             transform: scale(1.05);
+            box-shadow: 0 3px 10px rgba(5, 150, 105, 0.4);
         }
 
         /* Loading Animation */
@@ -1035,15 +980,15 @@
 
         @keyframes slideIn3D {
             0% { 
-                transform: translateX(-50px) translateY(20px) rotateY(-90deg) scale(0.3);
+                transform: translateX(-30px) translateY(10px) scale(0.8);
                 opacity: 0;
             }
             50% {
-                transform: translateX(-10px) translateY(-5px) rotateY(-20deg) scale(1.1);
+                transform: translateX(-5px) translateY(-2px) scale(1.05);
                 opacity: 0.8;
             }
             100% { 
-                transform: translateX(0) translateY(0) rotateY(0deg) scale(1);
+                transform: translateX(0) translateY(0) scale(1);
                 opacity: 1;
             }
         }
@@ -1157,10 +1102,10 @@
 
         // Removed particle creation function
 
-        // Create the Big Road grid
+        // Create the Big Road grid - optimized
         function createBigRoadGrid() {
             const grid = document.getElementById('big-road-grid');
-            grid.innerHTML = '';
+            const fragment = document.createDocumentFragment();
             
             for (let row = 0; row < ROWS; row++) {
                 for (let col = 0; col < COLS; col++) {
@@ -1168,9 +1113,11 @@
                     cell.className = 'road-cell empty';
                     cell.dataset.row = row;
                     cell.dataset.col = col;
-                    grid.appendChild(cell);
+                    fragment.appendChild(cell);
                 }
             }
+            
+            grid.appendChild(fragment);
         }
 
         // Add a new game result
@@ -1179,16 +1126,16 @@
             updateDisplay();
             autoScrollToLatest();
             
-            // Add visual feedback
-            const buttons = document.querySelectorAll('.game-btn');
-            buttons.forEach(btn => {
-                if (btn.classList.contains(result.toLowerCase() === 'b' ? 'banker' : result.toLowerCase() === 'p' ? 'player' : 'tie')) {
-                    btn.style.transform = 'scale(0.95)';
-                    setTimeout(() => {
-                        btn.style.transform = 'scale(1)';
-                    }, 150);
-                }
-            });
+            // Add visual feedback - simplified
+            const buttonClass = result.toLowerCase() === 'b' ? 'banker' : 
+                               result.toLowerCase() === 'p' ? 'player' : 'tie';
+            const targetBtn = document.querySelector(`.game-btn.${buttonClass}`);
+            if (targetBtn) {
+                targetBtn.style.transform = 'scale(0.95)';
+                requestAnimationFrame(() => {
+                    targetBtn.style.transform = 'scale(1)';
+                });
+            }
         }
 
 
@@ -1215,14 +1162,16 @@
             updateBigRoad();
         }
 
-        // Update statistics
+        // Update statistics - optimized
         function updateStats() {
-            const stats = {
-                B: gameHistory.filter(r => r === 'B').length,
-                P: gameHistory.filter(r => r === 'P').length,
-                T: gameHistory.filter(r => r === 'T').length
-            };
+            const stats = { B: 0, P: 0, T: 0 };
             
+            // Single loop count
+            for (const result of gameHistory) {
+                stats[result]++;
+            }
+            
+            // Update DOM once
             document.getElementById('banker-count').textContent = stats.B;
             document.getElementById('player-count').textContent = stats.P;
             document.getElementById('tie-count').textContent = stats.T;
@@ -1472,23 +1421,24 @@
         // Auto scroll to show the latest results
         function autoScrollToLatest() {
             const roadContainer = document.querySelector('.road-grid-container');
-            const gridWidth = COLS * 47;
+            if (!roadContainer) return;
+            
             const containerWidth = roadContainer.clientWidth;
             
+            // Find the last filled column
             let lastCol = 0;
             for (let col = COLS - 1; col >= 0; col--) {
-                for (let row = 0; row < ROWS; row++) {
-                    if (bigRoadMatrix[row][col]) {
-                        lastCol = col;
-                        break;
-                    }
+                if (bigRoadMatrix.some(row => row[col])) {
+                    lastCol = col;
+                    break;
                 }
-                if (lastCol > 0) break;
             }
             
-            if (lastCol * 47 > containerWidth - 200) {
+            // Scroll if needed
+            const scrollPosition = (lastCol * 47) - containerWidth + 200;
+            if (scrollPosition > 0) {
                 roadContainer.scrollTo({
-                    left: (lastCol * 47) - containerWidth + 200,
+                    left: scrollPosition,
                     behavior: 'smooth'
                 });
             }
