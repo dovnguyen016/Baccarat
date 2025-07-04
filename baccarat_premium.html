@@ -615,6 +615,444 @@
             box-shadow: 0 0 10px rgba(255, 215, 0, 0.15);
         }
 
+        /* Predictor and History Container */
+        .predictor-history-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        /* Predictor Panel */
+        .predictor-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: var(--shadow-dark);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .predictor-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--player-color), var(--gold), var(--banker-color));
+            animation: predictorGlow 4s ease-in-out infinite alternate;
+        }
+
+        @keyframes predictorGlow {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .predictor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .predictor-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .predictor-status {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .prediction-content {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .prediction-main {
+            flex: 1;
+        }
+
+        .prediction-result {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 215, 0, 0.05) 100%);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 16px;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .prediction-result::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+            transition: left 0.8s ease;
+        }
+
+        .prediction-result.active::before {
+            left: 100%;
+        }
+
+        .prediction-icon {
+            font-size: 2rem;
+            animation: iconPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes iconPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .prediction-text {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .prediction-confidence {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .confidence-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            min-width: 70px;
+        }
+
+        .confidence-bar {
+            flex: 1;
+            height: 8px;
+            background: var(--secondary-bg);
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--banker-color), var(--gold), var(--player-color));
+            transition: width 0.8s ease;
+            border-radius: 4px;
+        }
+
+        .confidence-text {
+            font-size: 0.9rem;
+            color: var(--gold);
+            font-weight: 700;
+            min-width: 40px;
+            text-align: right;
+        }
+
+        .prediction-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 12px 16px;
+            text-align: center;
+            min-width: 100px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-box:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 215, 0, 0.3);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--gold);
+        }
+
+        /* Warning styles for consecutive wrong predictions */
+        .stat-box.warning {
+            border-color: #e74c3c;
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.1) 0%, rgba(231, 76, 60, 0.05) 100%);
+            animation: warningPulse 2s ease-in-out infinite;
+        }
+
+        .stat-box.warning .stat-value {
+            color: #e74c3c;
+        }
+
+        @keyframes warningPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Emergency mode styles */
+        .prediction-result.emergency {
+            border-color: #e74c3c;
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.2) 0%, rgba(231, 76, 60, 0.1) 100%);
+            animation: emergencyGlow 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes emergencyGlow {
+            0% { box-shadow: 0 0 20px rgba(231, 76, 60, 0.3); }
+            100% { box-shadow: 0 0 30px rgba(231, 76, 60, 0.6); }
+        }
+
+        /* Prediction History Panel */
+        .prediction-history-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: var(--shadow-dark);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .prediction-history-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--tie-color), var(--gold), var(--banker-color));
+            animation: historyGlow 4s ease-in-out infinite alternate;
+        }
+
+        @keyframes historyGlow {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .prediction-history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .prediction-history-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .prediction-history-stats {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .prediction-history-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--gold) var(--secondary-bg);
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .prediction-history-grid::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .prediction-history-grid::-webkit-scrollbar-track {
+            background: var(--secondary-bg);
+            border-radius: 4px;
+        }
+
+        .prediction-history-grid::-webkit-scrollbar-thumb {
+            background: linear-gradient(90deg, var(--gold), #ffed4e);
+        .prediction-item {
+            background: var(--secondary-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: left;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            min-height: 60px;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            overflow: hidden;
+            margin-bottom: 4px;
+            width: 100%;
+            box-sizing: border-box;
+            animation: slideInHistory 0.5s ease-out forwards;
+        }
+
+        @keyframes slideInHistory {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }   margin-bottom: 4px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .prediction-item:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .prediction-item.correct {
+            background: linear-gradient(135deg, #059669, #10b981);
+            border-color: #34d399;
+            color: white;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .prediction-item.correct:hover {
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.6);
+        }
+
+        .prediction-item.wrong {
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            border-color: #f87171;
+            color: white;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .prediction-item.wrong:hover {
+            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.6);
+        }
+
+        .prediction-item.pending {
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            border-color: #fcd34d;
+            color: white;
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.4);
+            animation: pendingPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pendingPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .prediction-item .prediction-text {
+            font-size: 0.9rem;
+            font-weight: 900;
+            margin-bottom: 2px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .prediction-item .prediction-details {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 120px;
+            text-align: center;
+            flex: 1;
+        }
+
+        .prediction-item .confidence-indicator {
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            font-size: 0.7rem;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        /* Prediction Result Styles */
+        .prediction-result.banker {
+            border-color: var(--banker-color);
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.1) 0%, rgba(231, 76, 60, 0.05) 100%);
+        }
+
+        .prediction-result.player {
+            border-color: var(--player-color);
+            background: linear-gradient(135deg, rgba(41, 128, 185, 0.1) 0%, rgba(41, 128, 185, 0.05) 100%);
+        }
+
+        .prediction-result.tie {
+            border-color: var(--tie-color);
+            background: linear-gradient(135deg, rgba(46, 213, 115, 0.1) 0%, rgba(46, 213, 115, 0.05) 100%);
+        }
+
+        /* Emergency mode styles */
+        .prediction-result.emergency {
+            border-color: #ff6b6b;
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.15) 0%, rgba(255, 107, 107, 0.08) 100%);
+            animation: emergencyPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes emergencyPulse {
+            0%, 100% { 
+                box-shadow: 0 0 20px rgba(255, 107, 107, 0.3);
+            }
+            50% { 
+                box-shadow: 0 0 30px rgba(255, 107, 107, 0.6);
+            }
+        }
+
+        .stat-value.warning {
+            color: #ff6b6b !important;
+            animation: warningBlink 2s ease-in-out infinite;
+        }
+
+        @keyframes warningBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
         /* Big Road Container */
         .road-container {
             flex: 1;
@@ -910,6 +1348,16 @@
 
 
         /* Responsive Design */
+        @media (min-width: 1400px) {
+            .predictor-history-container {
+                gap: 40px;
+            }
+            
+            .predictor-panel, .prediction-history-panel {
+                padding: 30px;
+            }
+        }
+
         @media (max-width: 1200px) {
             .app-container {
                 padding: 15px;
@@ -934,6 +1382,33 @@
             .game-btn {
                 width: 200px;
             }
+            
+            .predictor-history-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .prediction-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .prediction-stats {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: space-around;
+                gap: 10px;
+            }
+            
+            .stat-box {
+                min-width: 80px;
+                flex: 1;
+            }
+            
+            .prediction-history-grid {
+                grid-template-columns: repeat(auto-fit, minmax(45px, 1fr));
+                gap: 6px;
+            }
         }
 
         @media (max-width: 768px) {
@@ -947,6 +1422,79 @@
             
             .control-panel {
                 padding: 20px;
+            }
+            
+            .predictor-history-container {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .predictor-panel {
+                padding: 20px;
+            }
+            
+            .prediction-history-panel {
+                padding: 20px;
+            }
+            
+            .predictor-header {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .prediction-history-header {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .prediction-result {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            
+            .prediction-confidence {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .confidence-bar {
+                width: 100%;
+            }
+            
+            .prediction-history-grid {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+            }
+            
+            .prediction-item {
+                min-height: 50px;
+                padding: 8px;
+                font-size: 0.8rem;
+                flex-direction: column;
+                text-align: center;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .prediction-item .prediction-text {
+                font-size: 0.8rem;
+                margin-bottom: 2px;
+            }
+            
+            .prediction-item .prediction-details {
+                font-size: 0.65rem;
+                max-width: 100%;
+                text-align: center;
+            }
+            
+            .prediction-item .confidence-indicator {
+                font-size: 0.65rem;
+                padding: 2px 6px;
+                margin-top: 2px;
             }
             
             .road-container {
@@ -1065,6 +1613,67 @@
             </div>
         </div>
 
+        <!-- Predictor and History Container -->
+        <div class="predictor-history-container fade-in">
+            <!-- Predictor Panel -->
+            <div class="predictor-panel">
+                <div class="predictor-header">
+                    <div class="predictor-title">🔮 AI Predictor</div>
+                    <div class="predictor-status" id="predictor-status">Analyzing...</div>
+                </div>
+                <div class="prediction-content">
+                    <div class="prediction-main">
+                        <div class="prediction-result" id="prediction-result">
+                            <div class="prediction-icon">🎯</div>
+                            <div class="prediction-text">Waiting for more data...</div>
+                        </div>
+                        <div class="prediction-confidence" id="prediction-confidence">
+                            <div class="confidence-label">Confidence</div>
+                            <div class="confidence-bar">
+                                <div class="confidence-fill" style="width: 0%"></div>
+                            </div>
+                            <div class="confidence-text">0%</div>
+                        </div>
+                    </div>
+                    <div class="prediction-stats">
+                        <div class="stat-box">
+                            <div class="stat-label">Streak</div>
+                            <div class="stat-value" id="current-streak">0</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Pattern</div>
+                            <div class="stat-value" id="pattern-type">None</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Methods</div>
+                            <div class="stat-value" id="methods-used">0</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Wrong</div>
+                            <div class="stat-value" id="consecutive-wrong">0</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Accuracy</div>
+                            <div class="stat-value" id="prediction-accuracy">0%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prediction History Panel -->
+            <div class="prediction-history-panel">
+                <div class="prediction-history-header">
+                    <div class="prediction-history-title">📊 Prediction History</div>
+                    <div class="prediction-history-stats" id="prediction-history-stats">
+                        <span id="history-correct">0</span> correct | <span id="history-wrong">0</span> wrong | <span id="history-pending">0</span> pending
+                    </div>
+                </div>
+                <div class="prediction-history-grid" id="prediction-history-grid">
+                    <!-- Prediction items will be added here by JavaScript -->
+                </div>
+            </div>
+        </div>
+
         <!-- Big Road -->
         <div class="road-container fade-in">
             <div class="road-header">
@@ -1088,6 +1697,35 @@
         // Core game state
         let gameHistory = [];
         let bigRoadMatrix = [];
+        let predictions = [];
+        let predictionAccuracy = { correct: 0, total: 0 };
+        let consecutiveWrong = 0; // Track consecutive wrong predictions
+        let adaptiveWeights = { // Dynamic weights for methods
+            streak: 1.0,
+            alternating: 1.0,
+            choppy: 1.0,
+            bias: 1.0,
+            double: 1.0,
+            momentum: 1.0,
+            mean: 1.0,
+            lastResult: 1.0,
+            zigzag: 1.0,
+            frequency: 1.0,
+            advancedStreak: 1.0,
+            patternRecognition: 1.0,
+            consecutiveCorrection: 1.0,
+            emergencyPattern: 1.0,
+            hotCold: 1.0,
+            cyclicPattern: 1.0,
+            probabilityMatrix: 1.0,
+            trendReversal: 1.0
+        };
+        
+        // Advanced tracking variables
+        let recentPerformance = []; // Track last 20 predictions
+        let patternHistory = []; // Track pattern occurrences
+        let methodSuccessRates = {}; // Track individual method success rates
+        let predictionHistory = []; // Track detailed prediction history for display
         
         // Constants
         const ROWS = 6;
@@ -1098,6 +1736,12 @@
             createBigRoadGrid();
             updateDisplay();
             addKeyboardShortcuts();
+            initPredictor();
+        }
+
+        // Initialize predictor
+        function initPredictor() {
+            updatePredictorDisplay();
         }
 
         // Removed particle creation function
@@ -1122,8 +1766,66 @@
 
         // Add a new game result
         function addResult(result) {
+            // Check prediction accuracy if we have a previous prediction
+            if (predictions.length > 0) {
+                const lastPrediction = predictions[predictions.length - 1];
+                if (lastPrediction.predicted !== 'T' && result !== 'T') {
+                    predictionAccuracy.total++;
+                    
+                    const isCorrect = lastPrediction.predicted === result;
+                    
+                    // Update prediction history status
+                    if (predictionHistory.length > 0) {
+                        const lastHistoryItem = predictionHistory[predictionHistory.length - 1];
+                        if (lastHistoryItem.status === 'pending') {
+                            lastHistoryItem.status = isCorrect ? 'correct' : 'wrong';
+                            lastHistoryItem.actual = result;
+                        }
+                    }
+                    
+                    // Track recent performance
+                    recentPerformance.push({
+                        correct: isCorrect,
+                        prediction: lastPrediction.predicted,
+                        actual: result,
+                        pattern: lastPrediction.pattern,
+                        confidence: lastPrediction.confidence
+                    });
+                    
+                    // Keep only last 20 predictions
+                    if (recentPerformance.length > 20) {
+                        recentPerformance.shift();
+                    }
+                    
+                    if (isCorrect) {
+                        predictionAccuracy.correct++;
+                        consecutiveWrong = 0; // Reset consecutive wrong counter
+                        
+                        // Boost weights of methods that contributed to correct prediction
+                        adjustWeightsOnSuccess(lastPrediction);
+                    } else {
+                        consecutiveWrong++;
+                        
+                        // Adjust weights and strategy when prediction is wrong
+                        adjustWeightsOnFailure(lastPrediction);
+                        
+                        // Apply emergency correction if too many wrong predictions
+                        if (consecutiveWrong >= 3) {
+                            applyEmergencyCorrection();
+                        }
+                    }
+                    
+                    // Apply smart weight adjustment based on recent performance
+                    smartWeightAdjustment();
+                    
+                    // Update prediction history display
+                    updatePredictionHistory();
+                }
+            }
+
             gameHistory.push(result);
             updateDisplay();
+            updatePredictorDisplay();
             autoScrollToLatest();
             
             // Add visual feedback - simplified
@@ -1144,7 +1846,29 @@
         function undoLast() {
             if (gameHistory.length > 0) {
                 gameHistory.pop();
+                
+                // Reset the last prediction to pending if it was resolved
+                if (predictionHistory.length > 0) {
+                    const lastHistoryItem = predictionHistory[predictionHistory.length - 1];
+                    if (lastHistoryItem.status !== 'pending') {
+                        lastHistoryItem.status = 'pending';
+                        lastHistoryItem.actual = null;
+                    }
+                }
+                
+                // Also remove the last prediction if it exists
+                if (predictions.length > 0) {
+                    predictions.pop();
+                }
+                
+                // Remove from recent performance
+                if (recentPerformance.length > 0) {
+                    recentPerformance.pop();
+                }
+                
                 updateDisplay();
+                updatePredictorDisplay();
+                updatePredictionHistory();
             }
         }
 
@@ -1153,13 +1877,942 @@
             if (gameHistory.length === 0) return;
             
             gameHistory = [];
+            predictions = [];
+            predictionAccuracy = { correct: 0, total: 0 };
+            consecutiveWrong = 0;
+            recentPerformance = [];
+            patternHistory = [];
+            methodSuccessRates = {};
+            predictionHistory = [];
+            
+            // Reset adaptive weights
+            Object.keys(adaptiveWeights).forEach(key => {
+                adaptiveWeights[key] = 1.0;
+            });
+            
             updateDisplay();
+            updatePredictorDisplay();
+            updatePredictionHistory();
         }
 
         // Update the entire display
         function updateDisplay() {
             updateStats();
             updateBigRoad();
+        }
+
+        // Predictor Logic
+        function generatePrediction() {
+            if (gameHistory.length < 3) {
+                return { predicted: null, confidence: 0, pattern: 'Insufficient data' };
+            }
+
+            const nonTieHistory = gameHistory.filter(r => r !== 'T');
+            if (nonTieHistory.length < 3) {
+                return { predicted: null, confidence: 0, pattern: 'Need non-tie results' };
+            }
+
+            // Multi-method analysis with adaptive weights
+            const analysisResults = [
+                { ...analyzeStreakPattern(nonTieHistory), weight: adaptiveWeights.streak },
+                { ...analyzeAlternatingPattern(nonTieHistory), weight: adaptiveWeights.alternating },
+                { ...analyzeChoppyPattern(nonTieHistory), weight: adaptiveWeights.choppy },
+                { ...analyzeBiasCorrection(nonTieHistory), weight: adaptiveWeights.bias },
+                { ...analyzeDoublePattern(nonTieHistory), weight: adaptiveWeights.double },
+                { ...analyzeTrendMomentum(nonTieHistory), weight: adaptiveWeights.momentum },
+                { ...analyzeStatisticalMean(nonTieHistory), weight: adaptiveWeights.mean },
+                { ...analyzeLastResultBias(nonTieHistory), weight: adaptiveWeights.lastResult },
+                { ...analyzeZigZagPattern(nonTieHistory), weight: adaptiveWeights.zigzag },
+                { ...analyzeFrequencyAnalysis(nonTieHistory), weight: adaptiveWeights.frequency },
+                // Advanced methods
+                { ...analyzeAdvancedStreakBreaking(nonTieHistory), weight: adaptiveWeights.advancedStreak },
+                { ...analyzePatternRecognition(nonTieHistory), weight: adaptiveWeights.patternRecognition },
+                { ...analyzeConsecutiveFailureCorrection(nonTieHistory), weight: adaptiveWeights.consecutiveCorrection },
+                { ...analyzeHotColdPattern(nonTieHistory), weight: adaptiveWeights.hotCold },
+                { ...analyzeCyclicPattern(nonTieHistory), weight: adaptiveWeights.cyclicPattern },
+                { ...analyzeProbabilityMatrix(nonTieHistory), weight: adaptiveWeights.probabilityMatrix },
+                { ...analyzeTrendReversal(nonTieHistory), weight: adaptiveWeights.trendReversal }
+            ];
+
+            // Apply emergency correction if consecutive failures
+            if (consecutiveWrong >= 2) {
+                analysisResults.push({ ...analyzeEmergencyPattern(nonTieHistory), weight: adaptiveWeights.emergencyPattern });
+            }
+
+            // Enhanced emergency mode for 3+ consecutive failures
+            if (consecutiveWrong >= 3) {
+                // Ultra-conservative approach: opposite of recent predictions
+                const lastPrediction = predictions[predictions.length - 1];
+                if (lastPrediction) {
+                    const emergencyPrediction = lastPrediction.predicted === 'B' ? 'P' : 'B';
+                    analysisResults.push({
+                        predicted: emergencyPrediction,
+                        confidence: 80,
+                        pattern: `Ultra-Emergency (${consecutiveWrong} failures)`,
+                        weight: 2.0
+                    });
+                }
+            }
+
+            // Debug logging with weights
+            console.log('🔍 Analysis Results with Weights:', analysisResults.map((r, i) => 
+                `Method ${i+1}: ${r.pattern} → ${r.predicted || 'None'} (${r.confidence}%) [Weight: ${r.weight?.toFixed(2) || 1.0}]`
+            ).join('\n'));
+
+            // Advanced weighted voting system
+            const votes = { B: 0, P: 0 };
+            let totalWeight = 0;
+            let bestPattern = 'Mixed analysis';
+            let maxConfidence = 0;
+            let highConfidenceMethods = 0;
+
+            analysisResults.forEach(result => {
+                if (result.predicted && result.confidence > 0) {
+                    const adjustedConfidence = result.confidence * (result.weight || 1.0);
+                    const weight = adjustedConfidence / 100;
+                    votes[result.predicted] += weight;
+                    totalWeight += weight;
+                    
+                    if (result.confidence >= 70) {
+                        highConfidenceMethods++;
+                    }
+                    
+                    if (adjustedConfidence > maxConfidence) {
+                        maxConfidence = adjustedConfidence;
+                        bestPattern = result.pattern;
+                    }
+                }
+            });
+
+            console.log('🗳️ Weighted Voting Results:', `B: ${votes.B.toFixed(2)}, P: ${votes.P.toFixed(2)}, Total Weight: ${totalWeight.toFixed(2)}`);
+            console.log('📊 Consecutive Wrong:', consecutiveWrong, '| High Confidence Methods:', highConfidenceMethods);
+
+            // Determine final prediction
+            let finalPrediction = null;
+            let finalConfidence = 0;
+
+            if (totalWeight > 0) {
+                finalPrediction = votes.B > votes.P ? 'B' : 'P';
+                
+                // Calculate confidence based on voting consensus
+                const winnerVotes = Math.max(votes.B, votes.P);
+                const consensus = winnerVotes / totalWeight;
+                
+                // Base confidence on consensus strength
+                finalConfidence = Math.round(consensus * 100);
+                
+                // Boost confidence if multiple methods agree
+                const methodsAgreeing = analysisResults.filter(r => 
+                    r.predicted === finalPrediction && r.confidence >= 60
+                ).length;
+                
+                if (methodsAgreeing >= 5) {
+                    finalConfidence = Math.min(90, finalConfidence + 15);
+                } else if (methodsAgreeing >= 3) {
+                    finalConfidence = Math.min(85, finalConfidence + 10);
+                } else if (methodsAgreeing >= 2) {
+                    finalConfidence = Math.min(75, finalConfidence + 5);
+                }
+                
+                // Boost confidence for high-confidence methods
+                if (highConfidenceMethods >= 3) {
+                    finalConfidence = Math.min(88, finalConfidence + 8);
+                }
+            }
+
+            // Adjust based on historical accuracy
+            if (predictionAccuracy.total >= 5) {
+                const accuracy = predictionAccuracy.correct / predictionAccuracy.total;
+                if (accuracy > 0.7) {
+                    finalConfidence = Math.min(92, finalConfidence + 10);
+                } else if (accuracy > 0.6) {
+                    finalConfidence = Math.min(88, finalConfidence + 6);
+                } else if (accuracy < 0.4) {
+                    finalConfidence = Math.max(35, finalConfidence - 10);
+                }
+            }
+
+            // Emergency confidence adjustment
+            if (consecutiveWrong >= 3) {
+                finalConfidence = Math.min(95, finalConfidence + 20);
+            } else if (consecutiveWrong >= 2) {
+                finalConfidence = Math.min(88, finalConfidence + 10);
+            }
+
+            return { 
+                predicted: finalPrediction, 
+                confidence: finalConfidence, 
+                pattern: bestPattern,
+                methods: analysisResults.length
+            };
+        }
+
+        // Method 1: Streak Pattern Analysis
+        function analyzeStreakPattern(history) {
+            const currentStreak = getCurrentStreak(history);
+            if (currentStreak.length >= 3) {
+                return {
+                    predicted: currentStreak.type === 'B' ? 'P' : 'B',
+                    confidence: Math.min(80, 50 + (currentStreak.length * 6)),
+                    pattern: `Break ${currentStreak.type}${currentStreak.length} streak`
+                };
+            }
+            return { predicted: null, confidence: 0, pattern: 'No streak' };
+        }
+
+        // Method 2: Alternating Pattern Analysis
+        function analyzeAlternatingPattern(history) {
+            const last4 = history.slice(-4);
+            if (last4.length >= 3) {
+                let alternations = 0;
+                for (let i = 1; i < last4.length; i++) {
+                    if (last4[i] !== last4[i-1]) alternations++;
+                }
+                
+                if (alternations >= 2) {
+                    return {
+                        predicted: last4[last4.length - 1] === 'B' ? 'P' : 'B',
+                        confidence: 60 + (alternations * 5),
+                        pattern: 'Alternating'
+                    };
+                }
+            }
+            return { predicted: null, confidence: 0, pattern: 'No alternation' };
+        }
+
+        // Method 3: Choppy Pattern Analysis
+        function analyzeChoppyPattern(history) {
+            const last8 = history.slice(-8);
+            if (last8.length >= 6) {
+                let changes = 0;
+                for (let i = 1; i < last8.length; i++) {
+                    if (last8[i] !== last8[i-1]) changes++;
+                }
+                
+                const changeRate = changes / (last8.length - 1);
+                if (changeRate >= 0.6) {
+                    return {
+                        predicted: last8[last8.length - 1] === 'B' ? 'P' : 'B',
+                        confidence: Math.round(55 + (changeRate * 20)),
+                        pattern: 'Choppy'
+                    };
+                }
+            }
+            return { predicted: null, confidence: 0, pattern: 'Not choppy' };
+        }
+
+        // Method 4: Bias Correction Analysis
+        function analyzeBiasCorrection(history) {
+            const recent = history.slice(-12);
+            if (recent.length >= 8) {
+                const bankerCount = recent.filter(r => r === 'B').length;
+                const playerCount = recent.filter(r => r === 'P').length;
+                const bias = Math.abs(bankerCount - playerCount);
+                
+                if (bias >= 3) {
+                    return {
+                        predicted: bankerCount > playerCount ? 'P' : 'B',
+                        confidence: Math.min(75, 50 + (bias * 4)),
+                        pattern: 'Bias correction'
+                    };
+                }
+            }
+            return { predicted: null, confidence: 0, pattern: 'No bias' };
+        }
+
+        // Method 5: Double Pattern Analysis
+        function analyzeDoublePattern(history) {
+            const last6 = history.slice(-6);
+            if (last6.length >= 4) {
+                // Check for double patterns: BB-PP, PP-BB, etc.
+                for (let i = 0; i < last6.length - 3; i++) {
+                    if (last6[i] === last6[i+1] && 
+                        last6[i+2] === last6[i+3] && 
+                        last6[i] !== last6[i+2]) {
+                        return {
+                            predicted: last6[i+3] === 'B' ? 'P' : 'B',
+                            confidence: 70,
+                            pattern: 'Double pattern'
+                        };
+                    }
+                }
+            }
+            return { predicted: null, confidence: 0, pattern: 'No double pattern' };
+        }
+
+        // Method 6: Trend Momentum Analysis
+        function analyzeTrendMomentum(history) {
+            const last5 = history.slice(-5);
+            if (last5.length >= 5) {
+                const bankerCount = last5.filter(r => r === 'B').length;
+                const playerCount = last5.filter(r => r === 'P').length;
+                
+                if (bankerCount >= 4) {
+                    return {
+                        predicted: 'B',
+                        confidence: 65,
+                        pattern: 'Banker momentum'
+                    };
+                } else if (playerCount >= 4) {
+                    return {
+                        predicted: 'P',
+                        confidence: 65,
+                        pattern: 'Player momentum'
+                    };
+                }
+            }
+            return { predicted: null, confidence: 0, pattern: 'No momentum' };
+        }
+
+        // Method 7: Statistical Mean Reversion
+        function analyzeStatisticalMean(history) {
+            if (history.length >= 20) {
+                const bankerCount = history.filter(r => r === 'B').length;
+                const playerCount = history.filter(r => r === 'P').length;
+                const total = bankerCount + playerCount;
+                
+                // Expected: Banker ~45.8%, Player ~44.6%
+                const expectedBanker = total * 0.458;
+                const expectedPlayer = total * 0.446;
+                
+                const bankerDeviation = bankerCount - expectedBanker;
+                const playerDeviation = playerCount - expectedPlayer;
+                
+                if (Math.abs(bankerDeviation) > 3) {
+                    return {
+                        predicted: bankerDeviation > 0 ? 'P' : 'B',
+                        confidence: Math.min(70, 50 + Math.abs(bankerDeviation) * 2),
+                        pattern: 'Mean reversion'
+                    };
+                }
+            }
+            return { predicted: null, confidence: 0, pattern: 'Within normal range' };
+        }
+
+        // Method 8: Last Result Bias
+        function analyzeLastResultBias(history) {
+            if (history.length >= 3) {
+                const lastResult = history[history.length - 1];
+                const secondLast = history[history.length - 2];
+                
+                if (lastResult === secondLast) {
+                    return {
+                        predicted: lastResult === 'B' ? 'P' : 'B',
+                        confidence: 55,
+                        pattern: 'Anti-repeat bias'
+                    };
+                } else {
+                    return {
+                        predicted: lastResult,
+                        confidence: 52,
+                        pattern: 'Continuation bias'
+                    };
+                }
+            }
+            return { predicted: null, confidence: 0, pattern: 'No bias pattern' };
+        }
+
+        // Method 9: Zig-Zag Pattern Analysis
+        function analyzeZigZagPattern(history) {
+            const last6 = history.slice(-6);
+            if (last6.length >= 6) {
+                // Check for zig-zag: B-P-B-P-B-P
+                let isZigZag = true;
+                for (let i = 1; i < last6.length; i++) {
+                    if (last6[i] === last6[i-1]) {
+                        isZigZag = false;
+                        break;
+                    }
+                }
+                
+                if (isZigZag) {
+                    return {
+                        predicted: last6[last6.length - 1] === 'B' ? 'P' : 'B',
+                        confidence: 68,
+                        pattern: 'Zig-zag'
+                    };
+                }
+            }
+            return { predicted: null, confidence: 0, pattern: 'No zig-zag' };
+        }
+
+        // Method 10: Frequency Analysis
+        function analyzeFrequencyAnalysis(history) {
+            const last10 = history.slice(-10);
+            if (last10.length >= 8) {
+                const bankerCount = last10.filter(r => r === 'B').length;
+                const playerCount = last10.filter(r => r === 'P').length;
+                
+                // Predict the less frequent one
+                if (Math.abs(bankerCount - playerCount) >= 3) {
+                    return {
+                        predicted: bankerCount < playerCount ? 'B' : 'P',
+                        confidence: 58,
+                        pattern: 'Frequency balance'
+                    };
+                }
+            }
+            return { predicted: null, confidence: 0, pattern: 'Balanced frequency' };
+        }
+
+        // Advanced Method 11: Advanced Streak Breaking
+        function analyzeAdvancedStreakBreaking(history) {
+            if (history.length >= 5) {
+                const streak = getCurrentStreak(history);
+                if (streak.length >= 2) {
+                    // More sophisticated streak breaking logic
+                    let breakProbability = 0;
+                    
+                    if (streak.length === 2) breakProbability = 0.35;
+                    else if (streak.length === 3) breakProbability = 0.45;
+                    else if (streak.length === 4) breakProbability = 0.60;
+                    else if (streak.length >= 5) breakProbability = 0.75;
+                    
+                    // Adjust based on recent pattern
+                    const last10 = history.slice(-10);
+                    const streakCount = countStreaksInHistory(last10);
+                    if (streakCount.long >= 2) breakProbability += 0.1;
+                    
+                    return {
+                        predicted: streak.type === 'B' ? 'P' : 'B',
+                        confidence: Math.round(breakProbability * 100),
+                        pattern: `Advanced streak break (${streak.length})`
+                    };
+                }
+            }
+            return { predicted: null, confidence: 0, pattern: 'No advanced streak' };
+        }
+
+        // Advanced Method 12: Pattern Recognition
+        function analyzePatternRecognition(history) {
+            if (history.length >= 8) {
+                const last8 = history.slice(-8);
+                
+                // Look for complex patterns
+                const patterns = [
+                    { seq: ['B', 'P', 'B', 'P'], next: 'B', confidence: 70 },
+                    { seq: ['P', 'B', 'P', 'B'], next: 'P', confidence: 70 },
+                    { seq: ['B', 'B', 'P', 'P'], next: 'B', confidence: 65 },
+                    { seq: ['P', 'P', 'B', 'B'], next: 'P', confidence: 65 },
+                    { seq: ['B', 'P', 'P', 'B'], next: 'P', confidence: 60 },
+                    { seq: ['P', 'B', 'B', 'P'], next: 'B', confidence: 60 }
+                ];
+                
+                for (let pattern of patterns) {
+                    for (let i = 0; i <= last8.length - pattern.seq.length; i++) {
+                        const slice = last8.slice(i, i + pattern.seq.length);
+                        if (JSON.stringify(slice) === JSON.stringify(pattern.seq)) {
+                            return {
+                                predicted: pattern.next,
+                                confidence: pattern.confidence,
+                                pattern: `Pattern: ${pattern.seq.join('-')}`
+                            };
+                        }
+                    }
+                }
+            }
+            return { predicted: null, confidence: 0, pattern: 'No pattern match' };
+        }
+
+        // Advanced Method 13: Consecutive Failure Correction
+        function analyzeConsecutiveFailureCorrection(history) {
+            if (consecutiveWrong >= 2 && history.length >= 3) {
+                const lastResult = history[history.length - 1];
+                const secondLast = history[history.length - 2];
+                
+                // If we've been wrong multiple times, try opposite strategy
+                let correctionConfidence = 55 + (consecutiveWrong * 10);
+                
+                if (lastResult === secondLast) {
+                    // If there's a streak, break it
+                    return {
+                        predicted: lastResult === 'B' ? 'P' : 'B',
+                        confidence: Math.min(80, correctionConfidence),
+                        pattern: `Failure correction (${consecutiveWrong} wrong)`
+                    };
+                } else {
+                    // If it's alternating, continue the pattern
+                    return {
+                        predicted: lastResult === 'B' ? 'P' : 'B',
+                        confidence: Math.min(75, correctionConfidence - 5),
+                        pattern: `Alt correction (${consecutiveWrong} wrong)`
+                    };
+                }
+            }
+            return { predicted: null, confidence: 0, pattern: 'No correction needed' };
+        }
+
+        // Emergency Method 14: Emergency Pattern
+        function analyzeEmergencyPattern(history) {
+            if (consecutiveWrong >= 2) {
+                const last5 = history.slice(-5);
+                const bankerCount = last5.filter(r => r === 'B').length;
+                const playerCount = last5.filter(r => r === 'P').length;
+                
+                // Emergency strategy: bet on the less frequent result in recent history
+                const predicted = bankerCount <= playerCount ? 'B' : 'P';
+                const confidence = 65 + (consecutiveWrong * 8);
+                
+                return {
+                    predicted: predicted,
+                    confidence: Math.min(85, confidence),
+                    pattern: `Emergency (${consecutiveWrong} failures)`
+                };
+            }
+            return { predicted: null, confidence: 0, pattern: 'No emergency' };
+        }
+
+        // Advanced Method 15: Hot/Cold Analysis
+        function analyzeHotColdPattern(history) {
+            if (history.length >= 12) {
+                const last12 = history.slice(-12);
+                const bankerCount = last12.filter(r => r === 'B').length;
+                const playerCount = last12.filter(r => r === 'P').length;
+                
+                // Hot/Cold threshold
+                const hotThreshold = 8;
+                const coldThreshold = 3;
+                
+                if (bankerCount >= hotThreshold) {
+                    return {
+                        predicted: 'P',
+                        confidence: 68,
+                        pattern: 'Banker hot - cooling'
+                    };
+                } else if (playerCount >= hotThreshold) {
+                    return {
+                        predicted: 'B',
+                        confidence: 68,
+                        pattern: 'Player hot - cooling'
+                    };
+                } else if (bankerCount <= coldThreshold) {
+                    return {
+                        predicted: 'B',
+                        confidence: 62,
+                        pattern: 'Banker cold - warming'
+                    };
+                } else if (playerCount <= coldThreshold) {
+                    return {
+                        predicted: 'P',
+                        confidence: 62,
+                        pattern: 'Player cold - warming'
+                    };
+                }
+            }
+            return { predicted: null, confidence: 0, pattern: 'No hot/cold' };
+        }
+
+        // Advanced Method 16: Cyclic Pattern Analysis
+        function analyzeCyclicPattern(history) {
+            if (history.length >= 15) {
+                const last15 = history.slice(-15);
+                
+                // Look for repeating cycles
+                const cycles = [
+                    { pattern: ['B', 'P', 'B'], confidence: 70 },
+                    { pattern: ['P', 'B', 'P'], confidence: 70 },
+                    { pattern: ['B', 'B', 'P'], confidence: 65 },
+                    { pattern: ['P', 'P', 'B'], confidence: 65 },
+                    { pattern: ['B', 'P', 'P'], confidence: 60 },
+                    { pattern: ['P', 'B', 'B'], confidence: 60 }
+                ];
+                
+                for (let cycle of cycles) {
+                    let occurrences = 0;
+                    for (let i = 0; i <= last15.length - cycle.pattern.length; i++) {
+                        const slice = last15.slice(i, i + cycle.pattern.length);
+                        if (JSON.stringify(slice) === JSON.stringify(cycle.pattern)) {
+                            occurrences++;
+                        }
+                    }
+                    
+                    if (occurrences >= 2) {
+                        // Predict next in cycle
+                        const lastPart = last15.slice(-cycle.pattern.length);
+                        if (JSON.stringify(lastPart) === JSON.stringify(cycle.pattern.slice(0, -1))) {
+                            return {
+                                predicted: cycle.pattern[cycle.pattern.length - 1],
+                                confidence: cycle.confidence + (occurrences * 5),
+                                pattern: `Cycle: ${cycle.pattern.join('-')} (${occurrences}x)`
+                            };
+                        }
+                    }
+                }
+            }
+            return { predicted: null, confidence: 0, pattern: 'No cycle' };
+        }
+
+        // Advanced Method 17: Probability Matrix
+        function analyzeProbabilityMatrix(history) {
+            if (history.length >= 20) {
+                const transitions = { 'B-B': 0, 'B-P': 0, 'P-B': 0, 'P-P': 0 };
+                
+                for (let i = 1; i < history.length; i++) {
+                    const transition = `${history[i-1]}-${history[i]}`;
+                    if (transitions[transition] !== undefined) {
+                        transitions[transition]++;
+                    }
+                }
+                
+                const lastResult = history[history.length - 1];
+                const bTransitions = transitions[`${lastResult}-B`];
+                const pTransitions = transitions[`${lastResult}-P`];
+                const total = bTransitions + pTransitions;
+                
+                if (total >= 5) {
+                    const bProb = bTransitions / total;
+                    const pProb = pTransitions / total;
+                    
+                    const predicted = bProb > pProb ? 'B' : 'P';
+                    const confidence = Math.round(Math.max(bProb, pProb) * 100);
+                    
+                    return {
+                        predicted: predicted,
+                        confidence: Math.min(75, confidence),
+                        pattern: `Matrix: ${Math.round(bProb * 100)}%B/${Math.round(pProb * 100)}%P`
+                    };
+                }
+            }
+            return { predicted: null, confidence: 0, pattern: 'No matrix data' };
+        }
+
+        // Advanced Method 18: Trend Reversal Detection
+        function analyzeTrendReversal(history) {
+            if (history.length >= 10) {
+                const last10 = history.slice(-10);
+                const bankerCount = last10.filter(r => r === 'B').length;
+                const playerCount = last10.filter(r => r === 'P').length;
+                
+                // Detect strong trend
+                const strongTrend = Math.abs(bankerCount - playerCount) >= 6;
+                
+                if (strongTrend) {
+                    const dominantSide = bankerCount > playerCount ? 'B' : 'P';
+                    const recentTrend = history.slice(-3);
+                    const recentDominant = recentTrend.filter(r => r === dominantSide).length;
+                    
+                    // If recent trend is slowing, predict reversal
+                    if (recentDominant <= 1) {
+                        return {
+                            predicted: dominantSide === 'B' ? 'P' : 'B',
+                            confidence: 72,
+                            pattern: `Trend reversal (${dominantSide} dominant)`
+                        };
+                    }
+                }
+            }
+            return { predicted: null, confidence: 0, pattern: 'No trend reversal' };
+        }
+
+        // Helper function to count streaks
+        function countStreaksInHistory(history) {
+            const streaks = { short: 0, medium: 0, long: 0 };
+            let currentStreak = 1;
+            
+            for (let i = 1; i < history.length; i++) {
+                if (history[i] === history[i-1]) {
+                    currentStreak++;
+                } else {
+                    if (currentStreak >= 2 && currentStreak <= 3) streaks.short++;
+                    else if (currentStreak >= 4 && currentStreak <= 5) streaks.medium++;
+                    else if (currentStreak >= 6) streaks.long++;
+                    currentStreak = 1;
+                }
+            }
+            
+            // Handle final streak
+            if (currentStreak >= 2 && currentStreak <= 3) streaks.short++;
+            else if (currentStreak >= 4 && currentStreak <= 5) streaks.medium++;
+            else if (currentStreak >= 6) streaks.long++;
+            
+            return streaks;
+        }
+
+        // Adaptive Learning Functions
+        function adjustWeightsOnSuccess(prediction) {
+            // Track successful pattern for future use
+            if (prediction.pattern) {
+                if (!methodSuccessRates[prediction.pattern]) {
+                    methodSuccessRates[prediction.pattern] = { correct: 0, total: 0 };
+                }
+                methodSuccessRates[prediction.pattern].correct++;
+                methodSuccessRates[prediction.pattern].total++;
+            }
+            
+            // Boost weights of methods that contributed to success
+            const methodNames = Object.keys(adaptiveWeights);
+            methodNames.forEach((method, index) => {
+                // More conservative boost for basic methods
+                if (index < 10) {
+                    adaptiveWeights[method] = Math.min(1.4, adaptiveWeights[method] + 0.03);
+                } else {
+                    // Higher boost for advanced methods
+                    adaptiveWeights[method] = Math.min(1.6, adaptiveWeights[method] + 0.05);
+                }
+            });
+            
+            // Reset consecutive wrong counter
+            consecutiveWrong = 0;
+            
+            console.log('✅ Weights boosted on success, consecutive wrong reset');
+        }
+
+        function adjustWeightsOnFailure(prediction) {
+            // Track failed pattern
+            if (prediction.pattern) {
+                if (!methodSuccessRates[prediction.pattern]) {
+                    methodSuccessRates[prediction.pattern] = { correct: 0, total: 0 };
+                }
+                methodSuccessRates[prediction.pattern].total++;
+            }
+            
+            // Reduce weights of methods that led to failure
+            const methodNames = Object.keys(adaptiveWeights);
+            methodNames.forEach((method, index) => {
+                if (index < 10) {
+                    adaptiveWeights[method] = Math.max(0.6, adaptiveWeights[method] - 0.02);
+                } else {
+                    // More aggressive reduction for advanced methods that failed
+                    adaptiveWeights[method] = Math.max(0.4, adaptiveWeights[method] - 0.04);
+                }
+            });
+            
+            // Boost emergency and correction methods
+            adaptiveWeights.consecutiveCorrection = Math.min(1.8, adaptiveWeights.consecutiveCorrection + 0.1);
+            adaptiveWeights.emergencyPattern = Math.min(1.8, adaptiveWeights.emergencyPattern + 0.1);
+            
+            console.log('❌ Weights reduced on failure, emergency methods boosted');
+        }
+
+        function applyEmergencyCorrection() {
+            // Dramatic weight adjustment for emergency
+            Object.keys(adaptiveWeights).forEach(key => {
+                adaptiveWeights[key] = 0.5; // Reduce all weights significantly
+            });
+            
+            // Boost most reliable methods in emergency
+            adaptiveWeights.bias = 1.5;
+            adaptiveWeights.frequency = 1.4;
+            adaptiveWeights.consecutiveCorrection = 1.8;
+            adaptiveWeights.emergencyPattern = 2.0;
+            adaptiveWeights.hotCold = 1.3;
+            adaptiveWeights.trendReversal = 1.3;
+            
+            console.log('🚨 Emergency correction applied! Weights dramatically adjusted');
+        }
+
+        function smartWeightAdjustment() {
+            // Adjust weights based on recent performance
+            if (recentPerformance.length >= 10) {
+                const recentAccuracy = recentPerformance.filter(p => p.correct).length / recentPerformance.length;
+                
+                if (recentAccuracy < 0.4) {
+                    // Poor performance - boost conservative methods
+                    adaptiveWeights.bias = Math.min(1.6, adaptiveWeights.bias + 0.2);
+                    adaptiveWeights.frequency = Math.min(1.6, adaptiveWeights.frequency + 0.2);
+                    adaptiveWeights.mean = Math.min(1.5, adaptiveWeights.mean + 0.1);
+                } else if (recentAccuracy > 0.7) {
+                    // Good performance - boost current successful methods
+                    Object.keys(adaptiveWeights).forEach(key => {
+                        adaptiveWeights[key] = Math.min(1.8, adaptiveWeights[key] + 0.05);
+                    });
+                }
+            }
+        }
+
+        function updatePredictionHistory() {
+            const historyGrid = document.getElementById('prediction-history-grid');
+            const historyCorrect = document.getElementById('history-correct');
+            const historyWrong = document.getElementById('history-wrong');
+            const historyPending = document.getElementById('history-pending');
+            
+            // Clear existing items
+            historyGrid.innerHTML = '';
+            
+            // Count statistics
+            let correctCount = 0;
+            let wrongCount = 0;
+            let pendingCount = 0;
+            
+            // Create fragments for better performance
+            const fragment = document.createDocumentFragment();
+            
+            // Display last 50 predictions for performance (newest first)
+            const displayHistory = predictionHistory.slice(-50).reverse();
+            
+            displayHistory.forEach((item, index) => {
+                const predictionItem = document.createElement('div');
+                predictionItem.className = 'prediction-item';
+                
+                let statusClass = '';
+                let statusIcon = '';
+                
+                if (item.status === 'correct') {
+                    statusClass = 'correct';
+                    statusIcon = '✅';
+                    correctCount++;
+                } else if (item.status === 'wrong') {
+                    statusClass = 'wrong';
+                    statusIcon = '❌';
+                    wrongCount++;
+                } else {
+                    statusClass = 'pending';
+                    statusIcon = '⏳';
+                    pendingCount++;
+                }
+                
+                predictionItem.classList.add(statusClass);
+                
+                const predictionText = item.predicted === 'B' ? 'BANKER' : 'PLAYER';
+                const actualText = item.actual ? (item.actual === 'B' ? 'BANKER' : 'PLAYER') : 'PENDING';
+                
+                predictionItem.innerHTML = `
+                    <div class="prediction-text">${statusIcon} ${predictionText}</div>
+                    <div class="prediction-details">
+                        ${item.actual ? `vs ${actualText}` : 'Waiting...'}
+                    </div>
+                    <div class="confidence-indicator">${item.confidence}%</div>
+                `;
+                
+                // Add tooltip with pattern info
+                predictionItem.title = `Pattern: ${item.pattern}\nConfidence: ${item.confidence}%\nMethods: ${item.methods}`;
+                
+                fragment.appendChild(predictionItem);
+            });
+            
+            historyGrid.appendChild(fragment);
+            
+            // Update statistics
+            historyCorrect.textContent = correctCount;
+            historyWrong.textContent = wrongCount;
+            historyPending.textContent = pendingCount;
+            
+            // Auto-scroll to top to show latest predictions
+            historyGrid.scrollTop = 0;
+        }
+
+        function getCurrentStreak(history) {
+            if (history.length === 0) return { type: null, length: 0 };
+            
+            const lastResult = history[history.length - 1];
+            let streakLength = 1;
+            
+            for (let i = history.length - 2; i >= 0; i--) {
+                if (history[i] === lastResult) {
+                    streakLength++;
+                } else {
+                    break;
+                }
+            }
+            
+            return { type: lastResult, length: streakLength };
+        }
+
+        function updatePredictorDisplay() {
+            const prediction = generatePrediction();
+            const currentStreak = getCurrentStreak(gameHistory.filter(r => r !== 'T'));
+            
+            // Update prediction result
+            const predictionResult = document.getElementById('prediction-result');
+            const predictionIcon = predictionResult.querySelector('.prediction-icon');
+            const predictionText = predictionResult.querySelector('.prediction-text');
+            
+            // Remove existing classes
+            predictionResult.classList.remove('banker', 'player', 'tie', 'active', 'emergency');
+            
+            if (prediction.predicted) {
+                predictionResult.classList.add(prediction.predicted.toLowerCase());
+                predictionResult.classList.add('active');
+                
+                // Add emergency class if in emergency mode
+                if (consecutiveWrong >= 2) {
+                    predictionResult.classList.add('emergency');
+                }
+                
+                const resultName = prediction.predicted === 'B' ? 'BANKER' : 'PLAYER';
+                const resultEmoji = prediction.predicted === 'B' ? '🏛️' : '👤';
+                
+                predictionIcon.textContent = resultEmoji;
+                predictionText.textContent = `Next: ${resultName}`;
+            } else {
+                predictionIcon.textContent = '🎯';
+                predictionText.textContent = prediction.pattern;
+            }
+            
+            // Update confidence
+            const confidenceFill = document.querySelector('.confidence-fill');
+            const confidenceText = document.querySelector('.confidence-text');
+            
+            confidenceFill.style.width = `${prediction.confidence}%`;
+            confidenceText.textContent = `${prediction.confidence}%`;
+            
+            // Update current streak
+            document.getElementById('current-streak').textContent = 
+                currentStreak.length > 0 ? `${currentStreak.type}${currentStreak.length}` : '0';
+            
+            // Update pattern
+            document.getElementById('pattern-type').textContent = prediction.pattern;
+            
+            // Update methods used
+            document.getElementById('methods-used').textContent = prediction.methods || 0;
+            
+            // Update consecutive wrong
+            const consecutiveWrongElement = document.getElementById('consecutive-wrong');
+            const consecutiveWrongBox = consecutiveWrongElement.closest('.stat-box');
+            consecutiveWrongElement.textContent = consecutiveWrong;
+            
+            // Add warning style if consecutive wrong >= 2
+            if (consecutiveWrong >= 2) {
+                consecutiveWrongBox.classList.add('warning');
+            } else {
+                consecutiveWrongBox.classList.remove('warning');
+            }
+            
+            // Update accuracy
+            const accuracy = predictionAccuracy.total > 0 ? 
+                Math.round((predictionAccuracy.correct / predictionAccuracy.total) * 100) : 0;
+            document.getElementById('prediction-accuracy').textContent = `${accuracy}%`;
+            
+            // Update status
+            const status = document.getElementById('predictor-status');
+            if (gameHistory.length < 3) {
+                status.textContent = 'Need more data...';
+            } else if (consecutiveWrong >= 3) {
+                status.textContent = '🚨 Emergency mode';
+            } else if (consecutiveWrong >= 2) {
+                status.textContent = '⚠️ Correction mode';
+            } else if (prediction.confidence >= 75) {
+                status.textContent = 'High confidence';
+            } else if (prediction.confidence >= 60) {
+                status.textContent = 'Medium confidence';
+            } else if (prediction.confidence >= 45) {
+                status.textContent = 'Low confidence';
+            } else {
+                status.textContent = 'Very low confidence';
+            }
+            
+            // Store prediction for accuracy tracking
+            if (prediction.predicted) {
+                const predictionData = {
+                    predicted: prediction.predicted,
+                    confidence: prediction.confidence,
+                    pattern: prediction.pattern,
+                    methods: prediction.methods,
+                    timestamp: Date.now(),
+                    status: 'pending',
+                    actual: null
+                };
+                
+                predictions.push(predictionData);
+                predictionHistory.push(predictionData);
+                
+                // Keep only last 100 predictions for performance
+                if (predictionHistory.length > 100) {
+                    predictionHistory.shift();
+                }
+                
+                updatePredictionHistory();
+            }
         }
 
         // Update statistics - optimized
