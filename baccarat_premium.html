@@ -880,27 +880,35 @@
         .prediction-history-grid {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            max-height: 300px;
+            gap: 10px;
+            max-height: 350px;
             overflow-y: auto;
+            overflow-x: hidden;
             scrollbar-width: thin;
             scrollbar-color: var(--gold) var(--secondary-bg);
-            padding: 10px;
-            border-radius: 10px;
-            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2));
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .prediction-history-grid::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
 
         .prediction-history-grid::-webkit-scrollbar-track {
             background: var(--secondary-bg);
-            border-radius: 4px;
+            border-radius: 10px;
         }
 
         .prediction-history-grid::-webkit-scrollbar-thumb {
-            background: linear-gradient(90deg, var(--gold), #ffed4e);
+            background: linear-gradient(180deg, var(--gold), #ffed4e);
+            border-radius: 10px;
+        }
+
+        .prediction-history-grid::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #ffed4e, var(--gold));
+        }
         .prediction-item {
             background: var(--secondary-bg);
             border: 2px solid var(--border-color);
@@ -926,53 +934,82 @@
             animation: slideInHistory 0.5s ease-out forwards;
         }
 
+        .prediction-item {
+            background: var(--secondary-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            text-align: left;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            min-height: 70px;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            overflow: hidden;
+            margin-bottom: 6px;
+            width: 100%;
+            box-sizing: border-box;
+            animation: slideInHistory 0.5s ease-out forwards;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
         @keyframes slideInHistory {
             from {
                 opacity: 0;
-                transform: translateX(-20px);
+                transform: translateY(-10px) scale(0.95);
             }
             to {
                 opacity: 1;
-                transform: translateX(0);
+                transform: translateY(0) scale(1);
             }
-        }   margin-bottom: 4px;
-            width: 100%;
-            box-sizing: border-box;
         }
 
         .prediction-item:hover {
-            transform: translateY(-2px) scale(1.05);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            border-color: rgba(255, 215, 0, 0.4);
         }
 
         .prediction-item.correct {
             background: linear-gradient(135deg, #059669, #10b981);
             border-color: #34d399;
             color: white;
-            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
         }
 
         .prediction-item.correct:hover {
-            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.6);
+            box-shadow: 0 6px 25px rgba(16, 185, 129, 0.5);
         }
 
         .prediction-item.wrong {
             background: linear-gradient(135deg, #dc2626, #ef4444);
             border-color: #f87171;
             color: white;
-            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
         }
 
         .prediction-item.wrong:hover {
-            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.6);
+            box-shadow: 0 6px 25px rgba(239, 68, 68, 0.5);
         }
 
         .prediction-item.pending {
             background: linear-gradient(135deg, #f59e0b, #fbbf24);
             border-color: #fcd34d;
             color: white;
-            box-shadow: 0 0 15px rgba(251, 191, 36, 0.4);
+            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
             animation: pendingPulse 2s ease-in-out infinite;
+        }
+
+        .prediction-item.pending:hover {
+            box-shadow: 0 6px 25px rgba(251, 191, 36, 0.5);
         }
 
         @keyframes pendingPulse {
@@ -981,34 +1018,38 @@
         }
 
         .prediction-item .prediction-text {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             font-weight: 900;
-            margin-bottom: 2px;
-            flex: 1;
+            margin-bottom: 0;
+            flex: 2;
             display: flex;
             align-items: center;
+            gap: 8px;
         }
 
         .prediction-item .prediction-details {
-            font-size: 0.75rem;
-            opacity: 0.8;
+            font-size: 0.8rem;
+            opacity: 0.9;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 120px;
+            max-width: 140px;
             text-align: center;
             flex: 1;
+            font-weight: 600;
         }
 
         .prediction-item .confidence-indicator {
-            background: rgba(0, 0, 0, 0.6);
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.6));
             color: white;
-            font-size: 0.7rem;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-weight: 600;
-            min-width: 40px;
+            font-size: 0.75rem;
+            padding: 6px 10px;
+            border-radius: 12px;
+            font-weight: 700;
+            min-width: 45px;
             text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
         }
 
         /* Prediction Result Styles */
@@ -1465,36 +1506,41 @@
             }
             
             .prediction-history-grid {
-                display: flex;
-                flex-direction: column;
-                gap: 4px;
+                padding: 10px;
+                gap: 8px;
             }
             
             .prediction-item {
-                min-height: 50px;
-                padding: 8px;
-                font-size: 0.8rem;
+                min-height: 60px;
+                padding: 12px;
+                font-size: 0.85rem;
                 flex-direction: column;
                 text-align: center;
                 align-items: center;
                 justify-content: center;
+                border-radius: 12px;
             }
             
             .prediction-item .prediction-text {
-                font-size: 0.8rem;
-                margin-bottom: 2px;
+                font-size: 0.85rem;
+                margin-bottom: 4px;
+                flex: none;
+                justify-content: center;
             }
             
             .prediction-item .prediction-details {
-                font-size: 0.65rem;
+                font-size: 0.7rem;
                 max-width: 100%;
                 text-align: center;
+                flex: none;
+                margin-bottom: 4px;
             }
             
             .prediction-item .confidence-indicator {
-                font-size: 0.65rem;
-                padding: 2px 6px;
-                margin-top: 2px;
+                font-size: 0.7rem;
+                padding: 4px 8px;
+                margin-top: 0;
+                border-radius: 8px;
             }
             
             .road-container {
@@ -1693,6 +1739,9 @@
         </div>
     </div>
 
+    <!-- Load AI Predictor -->
+    <script src="ai-predictor.js"></script>
+    
     <script>
         // Core game state
         let gameHistory = [];
@@ -1700,32 +1749,13 @@
         let predictions = [];
         let predictionAccuracy = { correct: 0, total: 0 };
         let consecutiveWrong = 0; // Track consecutive wrong predictions
-        let adaptiveWeights = { // Dynamic weights for methods
-            streak: 1.0,
-            alternating: 1.0,
-            choppy: 1.0,
-            bias: 1.0,
-            double: 1.0,
-            momentum: 1.0,
-            mean: 1.0,
-            lastResult: 1.0,
-            zigzag: 1.0,
-            frequency: 1.0,
-            advancedStreak: 1.0,
-            patternRecognition: 1.0,
-            consecutiveCorrection: 1.0,
-            emergencyPattern: 1.0,
-            hotCold: 1.0,
-            cyclicPattern: 1.0,
-            probabilityMatrix: 1.0,
-            trendReversal: 1.0
-        };
-        
-        // Advanced tracking variables
-        let recentPerformance = []; // Track last 20 predictions
-        let patternHistory = []; // Track pattern occurrences
-        let methodSuccessRates = {}; // Track individual method success rates
         let predictionHistory = []; // Track detailed prediction history for display
+        
+        // Additional variables for performance tracking
+        let recentPerformance = [];
+        
+        // Initialize AI Predictor
+        let aiPredictor = new BaccaratAIPredictor();
         
         // Constants
         const ROWS = 6;
@@ -1801,22 +1831,14 @@
                         predictionAccuracy.correct++;
                         consecutiveWrong = 0; // Reset consecutive wrong counter
                         
-                        // Boost weights of methods that contributed to correct prediction
-                        adjustWeightsOnSuccess(lastPrediction);
+                        // Update AI Predictor with successful prediction
+                        aiPredictor.updatePerformance(lastPrediction, result, isCorrect);
                     } else {
                         consecutiveWrong++;
                         
-                        // Adjust weights and strategy when prediction is wrong
-                        adjustWeightsOnFailure(lastPrediction);
-                        
-                        // Apply emergency correction if too many wrong predictions
-                        if (consecutiveWrong >= 3) {
-                            applyEmergencyCorrection();
-                        }
+                        // Update AI Predictor with failed prediction
+                        aiPredictor.updatePerformance(lastPrediction, result, isCorrect);
                     }
-                    
-                    // Apply smart weight adjustment based on recent performance
-                    smartWeightAdjustment();
                     
                     // Update prediction history display
                     updatePredictionHistory();
@@ -1881,14 +1903,10 @@
             predictionAccuracy = { correct: 0, total: 0 };
             consecutiveWrong = 0;
             recentPerformance = [];
-            patternHistory = [];
-            methodSuccessRates = {};
             predictionHistory = [];
             
-            // Reset adaptive weights
-            Object.keys(adaptiveWeights).forEach(key => {
-                adaptiveWeights[key] = 1.0;
-            });
+            // Reset AI Predictor
+            aiPredictor.reset();
             
             updateDisplay();
             updatePredictorDisplay();
@@ -1901,724 +1919,24 @@
             updateBigRoad();
         }
 
-        // Predictor Logic
+        // Predictor Logic - Using Advanced AI
         function generatePrediction() {
-            if (gameHistory.length < 3) {
-                return { predicted: null, confidence: 0, pattern: 'Insufficient data' };
-            }
-
-            const nonTieHistory = gameHistory.filter(r => r !== 'T');
-            if (nonTieHistory.length < 3) {
-                return { predicted: null, confidence: 0, pattern: 'Need non-tie results' };
-            }
-
-            // Multi-method analysis with adaptive weights
-            const analysisResults = [
-                { ...analyzeStreakPattern(nonTieHistory), weight: adaptiveWeights.streak },
-                { ...analyzeAlternatingPattern(nonTieHistory), weight: adaptiveWeights.alternating },
-                { ...analyzeChoppyPattern(nonTieHistory), weight: adaptiveWeights.choppy },
-                { ...analyzeBiasCorrection(nonTieHistory), weight: adaptiveWeights.bias },
-                { ...analyzeDoublePattern(nonTieHistory), weight: adaptiveWeights.double },
-                { ...analyzeTrendMomentum(nonTieHistory), weight: adaptiveWeights.momentum },
-                { ...analyzeStatisticalMean(nonTieHistory), weight: adaptiveWeights.mean },
-                { ...analyzeLastResultBias(nonTieHistory), weight: adaptiveWeights.lastResult },
-                { ...analyzeZigZagPattern(nonTieHistory), weight: adaptiveWeights.zigzag },
-                { ...analyzeFrequencyAnalysis(nonTieHistory), weight: adaptiveWeights.frequency },
-                // Advanced methods
-                { ...analyzeAdvancedStreakBreaking(nonTieHistory), weight: adaptiveWeights.advancedStreak },
-                { ...analyzePatternRecognition(nonTieHistory), weight: adaptiveWeights.patternRecognition },
-                { ...analyzeConsecutiveFailureCorrection(nonTieHistory), weight: adaptiveWeights.consecutiveCorrection },
-                { ...analyzeHotColdPattern(nonTieHistory), weight: adaptiveWeights.hotCold },
-                { ...analyzeCyclicPattern(nonTieHistory), weight: adaptiveWeights.cyclicPattern },
-                { ...analyzeProbabilityMatrix(nonTieHistory), weight: adaptiveWeights.probabilityMatrix },
-                { ...analyzeTrendReversal(nonTieHistory), weight: adaptiveWeights.trendReversal }
-            ];
-
-            // Apply emergency correction if consecutive failures
-            if (consecutiveWrong >= 2) {
-                analysisResults.push({ ...analyzeEmergencyPattern(nonTieHistory), weight: adaptiveWeights.emergencyPattern });
-            }
-
-            // Enhanced emergency mode for 3+ consecutive failures
-            if (consecutiveWrong >= 3) {
-                // Ultra-conservative approach: opposite of recent predictions
+            const prediction = aiPredictor.generatePrediction(gameHistory);
+            
+            // Update performance tracking
+            if (predictions.length > 0 && gameHistory.length > 0) {
                 const lastPrediction = predictions[predictions.length - 1];
-                if (lastPrediction) {
-                    const emergencyPrediction = lastPrediction.predicted === 'B' ? 'P' : 'B';
-                    analysisResults.push({
-                        predicted: emergencyPrediction,
-                        confidence: 80,
-                        pattern: `Ultra-Emergency (${consecutiveWrong} failures)`,
-                        weight: 2.0
-                    });
-                }
-            }
-
-            // Debug logging with weights
-            console.log('🔍 Analysis Results with Weights:', analysisResults.map((r, i) => 
-                `Method ${i+1}: ${r.pattern} → ${r.predicted || 'None'} (${r.confidence}%) [Weight: ${r.weight?.toFixed(2) || 1.0}]`
-            ).join('\n'));
-
-            // Advanced weighted voting system
-            const votes = { B: 0, P: 0 };
-            let totalWeight = 0;
-            let bestPattern = 'Mixed analysis';
-            let maxConfidence = 0;
-            let highConfidenceMethods = 0;
-
-            analysisResults.forEach(result => {
-                if (result.predicted && result.confidence > 0) {
-                    const adjustedConfidence = result.confidence * (result.weight || 1.0);
-                    const weight = adjustedConfidence / 100;
-                    votes[result.predicted] += weight;
-                    totalWeight += weight;
-                    
-                    if (result.confidence >= 70) {
-                        highConfidenceMethods++;
-                    }
-                    
-                    if (adjustedConfidence > maxConfidence) {
-                        maxConfidence = adjustedConfidence;
-                        bestPattern = result.pattern;
-                    }
-                }
-            });
-
-            console.log('🗳️ Weighted Voting Results:', `B: ${votes.B.toFixed(2)}, P: ${votes.P.toFixed(2)}, Total Weight: ${totalWeight.toFixed(2)}`);
-            console.log('📊 Consecutive Wrong:', consecutiveWrong, '| High Confidence Methods:', highConfidenceMethods);
-
-            // Determine final prediction
-            let finalPrediction = null;
-            let finalConfidence = 0;
-
-            if (totalWeight > 0) {
-                finalPrediction = votes.B > votes.P ? 'B' : 'P';
+                const lastResult = gameHistory[gameHistory.length - 1];
                 
-                // Calculate confidence based on voting consensus
-                const winnerVotes = Math.max(votes.B, votes.P);
-                const consensus = winnerVotes / totalWeight;
-                
-                // Base confidence on consensus strength
-                finalConfidence = Math.round(consensus * 100);
-                
-                // Boost confidence if multiple methods agree
-                const methodsAgreeing = analysisResults.filter(r => 
-                    r.predicted === finalPrediction && r.confidence >= 60
-                ).length;
-                
-                if (methodsAgreeing >= 5) {
-                    finalConfidence = Math.min(90, finalConfidence + 15);
-                } else if (methodsAgreeing >= 3) {
-                    finalConfidence = Math.min(85, finalConfidence + 10);
-                } else if (methodsAgreeing >= 2) {
-                    finalConfidence = Math.min(75, finalConfidence + 5);
-                }
-                
-                // Boost confidence for high-confidence methods
-                if (highConfidenceMethods >= 3) {
-                    finalConfidence = Math.min(88, finalConfidence + 8);
-                }
-            }
-
-            // Adjust based on historical accuracy
-            if (predictionAccuracy.total >= 5) {
-                const accuracy = predictionAccuracy.correct / predictionAccuracy.total;
-                if (accuracy > 0.7) {
-                    finalConfidence = Math.min(92, finalConfidence + 10);
-                } else if (accuracy > 0.6) {
-                    finalConfidence = Math.min(88, finalConfidence + 6);
-                } else if (accuracy < 0.4) {
-                    finalConfidence = Math.max(35, finalConfidence - 10);
-                }
-            }
-
-            // Emergency confidence adjustment
-            if (consecutiveWrong >= 3) {
-                finalConfidence = Math.min(95, finalConfidence + 20);
-            } else if (consecutiveWrong >= 2) {
-                finalConfidence = Math.min(88, finalConfidence + 10);
-            }
-
-            return { 
-                predicted: finalPrediction, 
-                confidence: finalConfidence, 
-                pattern: bestPattern,
-                methods: analysisResults.length
-            };
-        }
-
-        // Method 1: Streak Pattern Analysis
-        function analyzeStreakPattern(history) {
-            const currentStreak = getCurrentStreak(history);
-            if (currentStreak.length >= 3) {
-                return {
-                    predicted: currentStreak.type === 'B' ? 'P' : 'B',
-                    confidence: Math.min(80, 50 + (currentStreak.length * 6)),
-                    pattern: `Break ${currentStreak.type}${currentStreak.length} streak`
-                };
-            }
-            return { predicted: null, confidence: 0, pattern: 'No streak' };
-        }
-
-        // Method 2: Alternating Pattern Analysis
-        function analyzeAlternatingPattern(history) {
-            const last4 = history.slice(-4);
-            if (last4.length >= 3) {
-                let alternations = 0;
-                for (let i = 1; i < last4.length; i++) {
-                    if (last4[i] !== last4[i-1]) alternations++;
-                }
-                
-                if (alternations >= 2) {
-                    return {
-                        predicted: last4[last4.length - 1] === 'B' ? 'P' : 'B',
-                        confidence: 60 + (alternations * 5),
-                        pattern: 'Alternating'
-                    };
-                }
-            }
-            return { predicted: null, confidence: 0, pattern: 'No alternation' };
-        }
-
-        // Method 3: Choppy Pattern Analysis
-        function analyzeChoppyPattern(history) {
-            const last8 = history.slice(-8);
-            if (last8.length >= 6) {
-                let changes = 0;
-                for (let i = 1; i < last8.length; i++) {
-                    if (last8[i] !== last8[i-1]) changes++;
-                }
-                
-                const changeRate = changes / (last8.length - 1);
-                if (changeRate >= 0.6) {
-                    return {
-                        predicted: last8[last8.length - 1] === 'B' ? 'P' : 'B',
-                        confidence: Math.round(55 + (changeRate * 20)),
-                        pattern: 'Choppy'
-                    };
-                }
-            }
-            return { predicted: null, confidence: 0, pattern: 'Not choppy' };
-        }
-
-        // Method 4: Bias Correction Analysis
-        function analyzeBiasCorrection(history) {
-            const recent = history.slice(-12);
-            if (recent.length >= 8) {
-                const bankerCount = recent.filter(r => r === 'B').length;
-                const playerCount = recent.filter(r => r === 'P').length;
-                const bias = Math.abs(bankerCount - playerCount);
-                
-                if (bias >= 3) {
-                    return {
-                        predicted: bankerCount > playerCount ? 'P' : 'B',
-                        confidence: Math.min(75, 50 + (bias * 4)),
-                        pattern: 'Bias correction'
-                    };
-                }
-            }
-            return { predicted: null, confidence: 0, pattern: 'No bias' };
-        }
-
-        // Method 5: Double Pattern Analysis
-        function analyzeDoublePattern(history) {
-            const last6 = history.slice(-6);
-            if (last6.length >= 4) {
-                // Check for double patterns: BB-PP, PP-BB, etc.
-                for (let i = 0; i < last6.length - 3; i++) {
-                    if (last6[i] === last6[i+1] && 
-                        last6[i+2] === last6[i+3] && 
-                        last6[i] !== last6[i+2]) {
-                        return {
-                            predicted: last6[i+3] === 'B' ? 'P' : 'B',
-                            confidence: 70,
-                            pattern: 'Double pattern'
-                        };
-                    }
-                }
-            }
-            return { predicted: null, confidence: 0, pattern: 'No double pattern' };
-        }
-
-        // Method 6: Trend Momentum Analysis
-        function analyzeTrendMomentum(history) {
-            const last5 = history.slice(-5);
-            if (last5.length >= 5) {
-                const bankerCount = last5.filter(r => r === 'B').length;
-                const playerCount = last5.filter(r => r === 'P').length;
-                
-                if (bankerCount >= 4) {
-                    return {
-                        predicted: 'B',
-                        confidence: 65,
-                        pattern: 'Banker momentum'
-                    };
-                } else if (playerCount >= 4) {
-                    return {
-                        predicted: 'P',
-                        confidence: 65,
-                        pattern: 'Player momentum'
-                    };
-                }
-            }
-            return { predicted: null, confidence: 0, pattern: 'No momentum' };
-        }
-
-        // Method 7: Statistical Mean Reversion
-        function analyzeStatisticalMean(history) {
-            if (history.length >= 20) {
-                const bankerCount = history.filter(r => r === 'B').length;
-                const playerCount = history.filter(r => r === 'P').length;
-                const total = bankerCount + playerCount;
-                
-                // Expected: Banker ~45.8%, Player ~44.6%
-                const expectedBanker = total * 0.458;
-                const expectedPlayer = total * 0.446;
-                
-                const bankerDeviation = bankerCount - expectedBanker;
-                const playerDeviation = playerCount - expectedPlayer;
-                
-                if (Math.abs(bankerDeviation) > 3) {
-                    return {
-                        predicted: bankerDeviation > 0 ? 'P' : 'B',
-                        confidence: Math.min(70, 50 + Math.abs(bankerDeviation) * 2),
-                        pattern: 'Mean reversion'
-                    };
-                }
-            }
-            return { predicted: null, confidence: 0, pattern: 'Within normal range' };
-        }
-
-        // Method 8: Last Result Bias
-        function analyzeLastResultBias(history) {
-            if (history.length >= 3) {
-                const lastResult = history[history.length - 1];
-                const secondLast = history[history.length - 2];
-                
-                if (lastResult === secondLast) {
-                    return {
-                        predicted: lastResult === 'B' ? 'P' : 'B',
-                        confidence: 55,
-                        pattern: 'Anti-repeat bias'
-                    };
-                } else {
-                    return {
-                        predicted: lastResult,
-                        confidence: 52,
-                        pattern: 'Continuation bias'
-                    };
-                }
-            }
-            return { predicted: null, confidence: 0, pattern: 'No bias pattern' };
-        }
-
-        // Method 9: Zig-Zag Pattern Analysis
-        function analyzeZigZagPattern(history) {
-            const last6 = history.slice(-6);
-            if (last6.length >= 6) {
-                // Check for zig-zag: B-P-B-P-B-P
-                let isZigZag = true;
-                for (let i = 1; i < last6.length; i++) {
-                    if (last6[i] === last6[i-1]) {
-                        isZigZag = false;
-                        break;
-                    }
-                }
-                
-                if (isZigZag) {
-                    return {
-                        predicted: last6[last6.length - 1] === 'B' ? 'P' : 'B',
-                        confidence: 68,
-                        pattern: 'Zig-zag'
-                    };
-                }
-            }
-            return { predicted: null, confidence: 0, pattern: 'No zig-zag' };
-        }
-
-        // Method 10: Frequency Analysis
-        function analyzeFrequencyAnalysis(history) {
-            const last10 = history.slice(-10);
-            if (last10.length >= 8) {
-                const bankerCount = last10.filter(r => r === 'B').length;
-                const playerCount = last10.filter(r => r === 'P').length;
-                
-                // Predict the less frequent one
-                if (Math.abs(bankerCount - playerCount) >= 3) {
-                    return {
-                        predicted: bankerCount < playerCount ? 'B' : 'P',
-                        confidence: 58,
-                        pattern: 'Frequency balance'
-                    };
-                }
-            }
-            return { predicted: null, confidence: 0, pattern: 'Balanced frequency' };
-        }
-
-        // Advanced Method 11: Advanced Streak Breaking
-        function analyzeAdvancedStreakBreaking(history) {
-            if (history.length >= 5) {
-                const streak = getCurrentStreak(history);
-                if (streak.length >= 2) {
-                    // More sophisticated streak breaking logic
-                    let breakProbability = 0;
-                    
-                    if (streak.length === 2) breakProbability = 0.35;
-                    else if (streak.length === 3) breakProbability = 0.45;
-                    else if (streak.length === 4) breakProbability = 0.60;
-                    else if (streak.length >= 5) breakProbability = 0.75;
-                    
-                    // Adjust based on recent pattern
-                    const last10 = history.slice(-10);
-                    const streakCount = countStreaksInHistory(last10);
-                    if (streakCount.long >= 2) breakProbability += 0.1;
-                    
-                    return {
-                        predicted: streak.type === 'B' ? 'P' : 'B',
-                        confidence: Math.round(breakProbability * 100),
-                        pattern: `Advanced streak break (${streak.length})`
-                    };
-                }
-            }
-            return { predicted: null, confidence: 0, pattern: 'No advanced streak' };
-        }
-
-        // Advanced Method 12: Pattern Recognition
-        function analyzePatternRecognition(history) {
-            if (history.length >= 8) {
-                const last8 = history.slice(-8);
-                
-                // Look for complex patterns
-                const patterns = [
-                    { seq: ['B', 'P', 'B', 'P'], next: 'B', confidence: 70 },
-                    { seq: ['P', 'B', 'P', 'B'], next: 'P', confidence: 70 },
-                    { seq: ['B', 'B', 'P', 'P'], next: 'B', confidence: 65 },
-                    { seq: ['P', 'P', 'B', 'B'], next: 'P', confidence: 65 },
-                    { seq: ['B', 'P', 'P', 'B'], next: 'P', confidence: 60 },
-                    { seq: ['P', 'B', 'B', 'P'], next: 'B', confidence: 60 }
-                ];
-                
-                for (let pattern of patterns) {
-                    for (let i = 0; i <= last8.length - pattern.seq.length; i++) {
-                        const slice = last8.slice(i, i + pattern.seq.length);
-                        if (JSON.stringify(slice) === JSON.stringify(pattern.seq)) {
-                            return {
-                                predicted: pattern.next,
-                                confidence: pattern.confidence,
-                                pattern: `Pattern: ${pattern.seq.join('-')}`
-                            };
-                        }
-                    }
-                }
-            }
-            return { predicted: null, confidence: 0, pattern: 'No pattern match' };
-        }
-
-        // Advanced Method 13: Consecutive Failure Correction
-        function analyzeConsecutiveFailureCorrection(history) {
-            if (consecutiveWrong >= 2 && history.length >= 3) {
-                const lastResult = history[history.length - 1];
-                const secondLast = history[history.length - 2];
-                
-                // If we've been wrong multiple times, try opposite strategy
-                let correctionConfidence = 55 + (consecutiveWrong * 10);
-                
-                if (lastResult === secondLast) {
-                    // If there's a streak, break it
-                    return {
-                        predicted: lastResult === 'B' ? 'P' : 'B',
-                        confidence: Math.min(80, correctionConfidence),
-                        pattern: `Failure correction (${consecutiveWrong} wrong)`
-                    };
-                } else {
-                    // If it's alternating, continue the pattern
-                    return {
-                        predicted: lastResult === 'B' ? 'P' : 'B',
-                        confidence: Math.min(75, correctionConfidence - 5),
-                        pattern: `Alt correction (${consecutiveWrong} wrong)`
-                    };
-                }
-            }
-            return { predicted: null, confidence: 0, pattern: 'No correction needed' };
-        }
-
-        // Emergency Method 14: Emergency Pattern
-        function analyzeEmergencyPattern(history) {
-            if (consecutiveWrong >= 2) {
-                const last5 = history.slice(-5);
-                const bankerCount = last5.filter(r => r === 'B').length;
-                const playerCount = last5.filter(r => r === 'P').length;
-                
-                // Emergency strategy: bet on the less frequent result in recent history
-                const predicted = bankerCount <= playerCount ? 'B' : 'P';
-                const confidence = 65 + (consecutiveWrong * 8);
-                
-                return {
-                    predicted: predicted,
-                    confidence: Math.min(85, confidence),
-                    pattern: `Emergency (${consecutiveWrong} failures)`
-                };
-            }
-            return { predicted: null, confidence: 0, pattern: 'No emergency' };
-        }
-
-        // Advanced Method 15: Hot/Cold Analysis
-        function analyzeHotColdPattern(history) {
-            if (history.length >= 12) {
-                const last12 = history.slice(-12);
-                const bankerCount = last12.filter(r => r === 'B').length;
-                const playerCount = last12.filter(r => r === 'P').length;
-                
-                // Hot/Cold threshold
-                const hotThreshold = 8;
-                const coldThreshold = 3;
-                
-                if (bankerCount >= hotThreshold) {
-                    return {
-                        predicted: 'P',
-                        confidence: 68,
-                        pattern: 'Banker hot - cooling'
-                    };
-                } else if (playerCount >= hotThreshold) {
-                    return {
-                        predicted: 'B',
-                        confidence: 68,
-                        pattern: 'Player hot - cooling'
-                    };
-                } else if (bankerCount <= coldThreshold) {
-                    return {
-                        predicted: 'B',
-                        confidence: 62,
-                        pattern: 'Banker cold - warming'
-                    };
-                } else if (playerCount <= coldThreshold) {
-                    return {
-                        predicted: 'P',
-                        confidence: 62,
-                        pattern: 'Player cold - warming'
-                    };
-                }
-            }
-            return { predicted: null, confidence: 0, pattern: 'No hot/cold' };
-        }
-
-        // Advanced Method 16: Cyclic Pattern Analysis
-        function analyzeCyclicPattern(history) {
-            if (history.length >= 15) {
-                const last15 = history.slice(-15);
-                
-                // Look for repeating cycles
-                const cycles = [
-                    { pattern: ['B', 'P', 'B'], confidence: 70 },
-                    { pattern: ['P', 'B', 'P'], confidence: 70 },
-                    { pattern: ['B', 'B', 'P'], confidence: 65 },
-                    { pattern: ['P', 'P', 'B'], confidence: 65 },
-                    { pattern: ['B', 'P', 'P'], confidence: 60 },
-                    { pattern: ['P', 'B', 'B'], confidence: 60 }
-                ];
-                
-                for (let cycle of cycles) {
-                    let occurrences = 0;
-                    for (let i = 0; i <= last15.length - cycle.pattern.length; i++) {
-                        const slice = last15.slice(i, i + cycle.pattern.length);
-                        if (JSON.stringify(slice) === JSON.stringify(cycle.pattern)) {
-                            occurrences++;
-                        }
-                    }
-                    
-                    if (occurrences >= 2) {
-                        // Predict next in cycle
-                        const lastPart = last15.slice(-cycle.pattern.length);
-                        if (JSON.stringify(lastPart) === JSON.stringify(cycle.pattern.slice(0, -1))) {
-                            return {
-                                predicted: cycle.pattern[cycle.pattern.length - 1],
-                                confidence: cycle.confidence + (occurrences * 5),
-                                pattern: `Cycle: ${cycle.pattern.join('-')} (${occurrences}x)`
-                            };
-                        }
-                    }
-                }
-            }
-            return { predicted: null, confidence: 0, pattern: 'No cycle' };
-        }
-
-        // Advanced Method 17: Probability Matrix
-        function analyzeProbabilityMatrix(history) {
-            if (history.length >= 20) {
-                const transitions = { 'B-B': 0, 'B-P': 0, 'P-B': 0, 'P-P': 0 };
-                
-                for (let i = 1; i < history.length; i++) {
-                    const transition = `${history[i-1]}-${history[i]}`;
-                    if (transitions[transition] !== undefined) {
-                        transitions[transition]++;
-                    }
-                }
-                
-                const lastResult = history[history.length - 1];
-                const bTransitions = transitions[`${lastResult}-B`];
-                const pTransitions = transitions[`${lastResult}-P`];
-                const total = bTransitions + pTransitions;
-                
-                if (total >= 5) {
-                    const bProb = bTransitions / total;
-                    const pProb = pTransitions / total;
-                    
-                    const predicted = bProb > pProb ? 'B' : 'P';
-                    const confidence = Math.round(Math.max(bProb, pProb) * 100);
-                    
-                    return {
-                        predicted: predicted,
-                        confidence: Math.min(75, confidence),
-                        pattern: `Matrix: ${Math.round(bProb * 100)}%B/${Math.round(pProb * 100)}%P`
-                    };
-                }
-            }
-            return { predicted: null, confidence: 0, pattern: 'No matrix data' };
-        }
-
-        // Advanced Method 18: Trend Reversal Detection
-        function analyzeTrendReversal(history) {
-            if (history.length >= 10) {
-                const last10 = history.slice(-10);
-                const bankerCount = last10.filter(r => r === 'B').length;
-                const playerCount = last10.filter(r => r === 'P').length;
-                
-                // Detect strong trend
-                const strongTrend = Math.abs(bankerCount - playerCount) >= 6;
-                
-                if (strongTrend) {
-                    const dominantSide = bankerCount > playerCount ? 'B' : 'P';
-                    const recentTrend = history.slice(-3);
-                    const recentDominant = recentTrend.filter(r => r === dominantSide).length;
-                    
-                    // If recent trend is slowing, predict reversal
-                    if (recentDominant <= 1) {
-                        return {
-                            predicted: dominantSide === 'B' ? 'P' : 'B',
-                            confidence: 72,
-                            pattern: `Trend reversal (${dominantSide} dominant)`
-                        };
-                    }
-                }
-            }
-            return { predicted: null, confidence: 0, pattern: 'No trend reversal' };
-        }
-
-        // Helper function to count streaks
-        function countStreaksInHistory(history) {
-            const streaks = { short: 0, medium: 0, long: 0 };
-            let currentStreak = 1;
-            
-            for (let i = 1; i < history.length; i++) {
-                if (history[i] === history[i-1]) {
-                    currentStreak++;
-                } else {
-                    if (currentStreak >= 2 && currentStreak <= 3) streaks.short++;
-                    else if (currentStreak >= 4 && currentStreak <= 5) streaks.medium++;
-                    else if (currentStreak >= 6) streaks.long++;
-                    currentStreak = 1;
+                if (lastPrediction && lastResult !== 'T') {
+                    const isCorrect = lastPrediction.predicted === lastResult;
+                    aiPredictor.updatePerformance(lastPrediction, lastResult, isCorrect);
                 }
             }
             
-            // Handle final streak
-            if (currentStreak >= 2 && currentStreak <= 3) streaks.short++;
-            else if (currentStreak >= 4 && currentStreak <= 5) streaks.medium++;
-            else if (currentStreak >= 6) streaks.long++;
-            
-            return streaks;
+            return prediction;
         }
 
-        // Adaptive Learning Functions
-        function adjustWeightsOnSuccess(prediction) {
-            // Track successful pattern for future use
-            if (prediction.pattern) {
-                if (!methodSuccessRates[prediction.pattern]) {
-                    methodSuccessRates[prediction.pattern] = { correct: 0, total: 0 };
-                }
-                methodSuccessRates[prediction.pattern].correct++;
-                methodSuccessRates[prediction.pattern].total++;
-            }
-            
-            // Boost weights of methods that contributed to success
-            const methodNames = Object.keys(adaptiveWeights);
-            methodNames.forEach((method, index) => {
-                // More conservative boost for basic methods
-                if (index < 10) {
-                    adaptiveWeights[method] = Math.min(1.4, adaptiveWeights[method] + 0.03);
-                } else {
-                    // Higher boost for advanced methods
-                    adaptiveWeights[method] = Math.min(1.6, adaptiveWeights[method] + 0.05);
-                }
-            });
-            
-            // Reset consecutive wrong counter
-            consecutiveWrong = 0;
-            
-            console.log('✅ Weights boosted on success, consecutive wrong reset');
-        }
-
-        function adjustWeightsOnFailure(prediction) {
-            // Track failed pattern
-            if (prediction.pattern) {
-                if (!methodSuccessRates[prediction.pattern]) {
-                    methodSuccessRates[prediction.pattern] = { correct: 0, total: 0 };
-                }
-                methodSuccessRates[prediction.pattern].total++;
-            }
-            
-            // Reduce weights of methods that led to failure
-            const methodNames = Object.keys(adaptiveWeights);
-            methodNames.forEach((method, index) => {
-                if (index < 10) {
-                    adaptiveWeights[method] = Math.max(0.6, adaptiveWeights[method] - 0.02);
-                } else {
-                    // More aggressive reduction for advanced methods that failed
-                    adaptiveWeights[method] = Math.max(0.4, adaptiveWeights[method] - 0.04);
-                }
-            });
-            
-            // Boost emergency and correction methods
-            adaptiveWeights.consecutiveCorrection = Math.min(1.8, adaptiveWeights.consecutiveCorrection + 0.1);
-            adaptiveWeights.emergencyPattern = Math.min(1.8, adaptiveWeights.emergencyPattern + 0.1);
-            
-            console.log('❌ Weights reduced on failure, emergency methods boosted');
-        }
-
-        function applyEmergencyCorrection() {
-            // Dramatic weight adjustment for emergency
-            Object.keys(adaptiveWeights).forEach(key => {
-                adaptiveWeights[key] = 0.5; // Reduce all weights significantly
-            });
-            
-            // Boost most reliable methods in emergency
-            adaptiveWeights.bias = 1.5;
-            adaptiveWeights.frequency = 1.4;
-            adaptiveWeights.consecutiveCorrection = 1.8;
-            adaptiveWeights.emergencyPattern = 2.0;
-            adaptiveWeights.hotCold = 1.3;
-            adaptiveWeights.trendReversal = 1.3;
-            
-            console.log('🚨 Emergency correction applied! Weights dramatically adjusted');
-        }
-
-        function smartWeightAdjustment() {
-            // Adjust weights based on recent performance
-            if (recentPerformance.length >= 10) {
-                const recentAccuracy = recentPerformance.filter(p => p.correct).length / recentPerformance.length;
-                
-                if (recentAccuracy < 0.4) {
-                    // Poor performance - boost conservative methods
-                    adaptiveWeights.bias = Math.min(1.6, adaptiveWeights.bias + 0.2);
-                    adaptiveWeights.frequency = Math.min(1.6, adaptiveWeights.frequency + 0.2);
-                    adaptiveWeights.mean = Math.min(1.5, adaptiveWeights.mean + 0.1);
-                } else if (recentAccuracy > 0.7) {
-                    // Good performance - boost current successful methods
-                    Object.keys(adaptiveWeights).forEach(key => {
-                        adaptiveWeights[key] = Math.min(1.8, adaptiveWeights[key] + 0.05);
-                    });
-                }
-            }
-        }
 
         function updatePredictionHistory() {
             const historyGrid = document.getElementById('prediction-history-grid');
