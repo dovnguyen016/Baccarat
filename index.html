@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baccarat Predictor</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Baccarat Predictor</h1>
+        <div class="input-section">
+            <label for="history">Nhập lịch sử (B = Banker, P = Player, T = Tie):</label>
+            <div class="input-history-row">
+                <input type="text" id="history" placeholder="VD: BPTBPBBT" />
+                <div id="history-visual" class="history-visual"></div>
+            </div>
+            <div class="history-btns">
+                <button type="button" id="addBanker" class="add-btn banker">BANKER</button>
+                <button type="button" id="addPlayer" class="add-btn player">PLAYER</button>
+                <button type="button" id="addTie" class="add-btn tie">TIE</button>
+            </div>
+            <button id="predictBtn">Dự đoán</button>
+        </div>
+        <div class="roads-section">
+          <div class="roads-flex">
+            <div class="bead-plate-col">
+                <h3>Bead Plate</h3>
+                <div id="bead-plate" class="road-grid bead-plate-grid"></div>
+            </div>
+            <div class="main-roads-col">
+                <h3>Big Road</h3>
+                <div id="big-road" class="road-grid big-road-grid"></div>
+                <div class="sub-roads-row">
+                    <div>
+                        <h4>Big Eye Boy</h4>
+                        <div id="big-eye-boy" class="road-grid sub-road-grid"></div>
+                    </div>
+                    <div>
+                        <h4>Small Road</h4>
+                        <div id="small-road" class="road-grid sub-road-grid"></div>
+                    </div>
+                    <div>
+                        <h4>Cockroach Pig</h4>
+                        <div id="cockroach-pig" class="road-grid sub-road-grid"></div>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+        <div class="result-section" id="result"></div>
+    </div>
+    <script src="ai-predictor.js" type="module"></script>
+    <script src="main.js" type="module"></script>
+</body>
+</html>

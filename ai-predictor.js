@@ -1,1453 +1,732 @@
-/**
- * Optimized AI Baccarat Predictor Engine
- * High-accuracy prediction system with proven effective methods only
- */
 
-class BaccaratAIPredictor {
-    constructor() {
-        // Core tracking variables
-        this.recentPerformance = []; // Track last 30 predictions
-        this.patternMemory = new Map(); // Remember successful patterns
-        this.streakHistory = []; // Track streak patterns
-        this.transitionMatrix = {}; // Track B->B, B->P, P->B, P->P transitions
-        
-        // Only proven effective methods with optimized weights
-        this.methodWeights = {
-            streakBreaker: 2.5,      // Highest weight - most effective
-            patternMatching: 2.0,    // Very effective for pattern recognition
-            trendFollowing: 1.8,     // Good for momentum detection
-            meanReversion: 1.5,      // Effective for bias correction
-            markovChain: 1.3,        // Good statistical foundation
-            emergencyMode: 3.0       // Highest priority when needed
-        };
-        
-        // Anti-consecutive-failure system
-        this.consecutiveFailures = 0;
-        this.emergencyMode = false;
-        this.lastPredictions = [];
-        this.maxConsecutiveFailures = 1; // Trigger emergency after 1 failure
-        
-        // Performance tracking
-        this.methodSuccess = {};
-        Object.keys(this.methodWeights).forEach(method => {
-            this.methodSuccess[method] = { correct: 0, total: 0 };
-        });
-        
-        this.initializeTransitionMatrix();
-    }
-    
-    // Initialize transition matrix for Markov chain
-    initializeTransitionMatrix() {
-        this.transitionMatrix = {
-            'B': { 'B': 0, 'P': 0 },
-            'P': { 'B': 0, 'P': 0 }
-        };
-    }
-    
-    // Main prediction function - optimized with only effective methods
-    generatePrediction(gameHistory) {
-        if (gameHistory.length < 3) {
-            return { predicted: null, confidence: 0, pattern: 'Insufficient data', methods: 'N/A' };
-        }
-
-        const nonTieHistory = gameHistory.filter(r => r !== 'T');
-        if (nonTieHistory.length < 3) {
-            return { predicted: null, confidence: 0, pattern: 'Need non-tie results', methods: 'N/A' };
-        }
-
-        // Emergency mode activation - highest priority
-        if (this.consecutiveFailures >= this.maxConsecutiveFailures) {
-            return this.getEmergencyPrediction(nonTieHistory);
-        }
-
-        // Run only proven effective methods
-        const predictions = [];
-        
-        // Method 1: Streak Breaker (Most Effective - 70%+ accuracy)
-        const streakPrediction = this.analyzeStreakBreaker(nonTieHistory);
-        if (streakPrediction.predicted) {
-            predictions.push({ ...streakPrediction, weight: this.methodWeights.streakBreaker, method: 'streakBreaker' });
-        }
-
-        // Method 2: Pattern Matching (Very Effective - 65%+ accuracy)
-        const patternPrediction = this.analyzePatternMatching(nonTieHistory);
-        if (patternPrediction.predicted) {
-            predictions.push({ ...patternPrediction, weight: this.methodWeights.patternMatching, method: 'patternMatching' });
-        }
-
-        // Method 3: Trend Following (Good - 62%+ accuracy)
-        const trendPrediction = this.analyzeTrendFollowing(nonTieHistory);
-        if (trendPrediction.predicted) {
-            predictions.push({ ...trendPrediction, weight: this.methodWeights.trendFollowing, method: 'trendFollowing' });
-        }
-
-        // Method 4: Mean Reversion (Effective - 60%+ accuracy)
-        const reversionPrediction = this.analyzeMeanReversion(nonTieHistory);
-        if (reversionPrediction.predicted) {
-            predictions.push({ ...reversionPrediction, weight: this.methodWeights.meanReversion, method: 'meanReversion' });
-        }
-
-        // Method 5: Markov Chain (Statistical - 58%+ accuracy)
-        const markovPrediction = this.analyzeMarkovChain(nonTieHistory);
-        if (markovPrediction.predicted) {
-            predictions.push({ ...markovPrediction, weight: this.methodWeights.markovChain, method: 'markovChain' });
-        }
-
-        // Calculate final prediction using weighted voting
-        return this.calculateFinalPrediction(predictions);
-    }
-
-    // METHOD 1: Streak Breaker - Most effective method
-    analyzeStreakBreaker(history) {
-        const currentStreak = this.getCurrentStreak(history);
-        
-        // Break streaks of 3 or more (proven most effective)
-        if (currentStreak.length >= 3) {
-            const oppositeResult = currentStreak.type === 'B' ? 'P' : 'B';
-            const confidence = Math.min(85, 70 + (currentStreak.length - 3) * 3);
-            
-            return {
-                predicted: oppositeResult,
-                confidence: confidence,
-                pattern: `Break ${currentStreak.type} streak of ${currentStreak.length}`
-            };
-        }
-        
-        // Break double streaks with lower confidence
-        if (currentStreak.length === 2) {
-            const oppositeResult = currentStreak.type === 'B' ? 'P' : 'B';
-            return {
-                predicted: oppositeResult,
-                confidence: 68,
-                pattern: `Break ${currentStreak.type} double`
-            };
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'No significant streak' };
-    }
-
-    // METHOD 2: Pattern Matching - Very effective
-    analyzePatternMatching(history) {
-        // Look for repeating patterns in last 4-8 results
-        const patterns = this.findRepeatingPatterns(history);
-        
-        if (patterns.bestPattern) {
-            const nextResult = this.predictFromPattern(patterns.bestPattern, history);
-            if (nextResult) {
-                return {
-                    predicted: nextResult.predicted,
-                    confidence: nextResult.confidence,
-                    pattern: `Pattern: ${patterns.bestPattern.pattern}`
-                };
-            }
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'No pattern found' };
-    }
-
-    // METHOD 3: Trend Following - Good for momentum
-    analyzeTrendFollowing(history) {
-        const recentResults = history.slice(-8);
-        const bCount = recentResults.filter(r => r === 'B').length;
-        const pCount = recentResults.filter(r => r === 'P').length;
-        
-        const dominanceRatio = Math.max(bCount, pCount) / recentResults.length;
-        
-        // Follow strong trends (70%+ dominance)
-        if (dominanceRatio >= 0.7) {
-            const dominantSide = bCount > pCount ? 'B' : 'P';
-            return {
-                predicted: dominantSide,
-                confidence: Math.min(75, 60 + (dominanceRatio - 0.7) * 50),
-                pattern: `Follow ${dominantSide} trend (${Math.round(dominanceRatio * 100)}%)`
-            };
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'No strong trend' };
-    }
-
-    // METHOD 4: Mean Reversion - Effective for bias correction
-    analyzeMeanReversion(history) {
-        const recentResults = history.slice(-12);
-        const bCount = recentResults.filter(r => r === 'B').length;
-        const bRatio = bCount / recentResults.length;
-        
-        const deviation = Math.abs(bRatio - 0.5);
-        
-        // Revert when deviation is significant (>25%)
-        if (deviation > 0.25) {
-            const predicted = bRatio > 0.5 ? 'P' : 'B';
-            return {
-                predicted: predicted,
-                confidence: Math.min(72, 55 + deviation * 40),
-                pattern: `Mean reversion: ${Math.round(bRatio * 100)}% B`
-            };
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'No reversion signal' };
-    }
-
-    // METHOD 5: Markov Chain - Statistical foundation
-    analyzeMarkovChain(history) {
-        this.updateTransitionMatrix(history);
-        
-        const lastResult = history[history.length - 1];
-        const transitions = this.transitionMatrix[lastResult];
-        
-        if (transitions) {
-            const total = transitions.B + transitions.P;
-            if (total > 0) {
-                const bProbability = transitions.B / total;
-                const predicted = bProbability > 0.5 ? 'B' : 'P';
-                const confidence = Math.min(70, 50 + Math.abs(bProbability - 0.5) * 40);
-                
-                return {
-                    predicted: predicted,
-                    confidence: confidence,
-                    pattern: `Markov: ${lastResult}→${predicted} (${Math.round(Math.max(bProbability, 1 - bProbability) * 100)}%)`
-                };
-            }
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'Insufficient transition data' };
-    }
-
-    // Emergency prediction when consecutive failures occur
-    getEmergencyPrediction(history) {
-        // Use most conservative approach - opposite of recent failures
-        const recentFailures = this.lastPredictions.slice(-2);
-        
-        if (recentFailures.length > 0) {
-            // Do opposite of last failed prediction
-            const lastFailed = recentFailures[recentFailures.length - 1];
-            const predicted = lastFailed === 'B' ? 'P' : 'B';
-            
-            return {
-                predicted: predicted,
-                confidence: 80, // High confidence in emergency mode
-                pattern: `Emergency: Opposite of failed prediction`,
-                methods: 'Emergency',
-                isEmergency: true
-            };
-        }
-        
-        // Fallback: Follow the current trend
-        const last3 = history.slice(-3);
-        const bCount = last3.filter(r => r === 'B').length;
-        const predicted = bCount >= 2 ? 'B' : 'P';
-        
-        return {
-            predicted: predicted,
-            confidence: 75,
-            pattern: `Emergency: Follow recent trend`,
-            methods: 'Emergency',
-            isEmergency: true
-        };
-    }
-
-    // Method 1: Streak Pattern Analysis
-    analyzeStreakPattern(history) {
-        if (history.length < 3) return { predicted: null, confidence: 0, pattern: 'Insufficient data' };
-        
-        const currentStreak = this.getCurrentStreak(history);
-        const streakHistory = this.getStreakHistory(history);
-        
-        if (currentStreak.length >= 3) {
-            const oppositeResult = currentStreak.type === 'B' ? 'P' : 'B';
-            const confidence = Math.min(85, 60 + (currentStreak.length * 5));
-            return {
-                predicted: oppositeResult,
-                confidence: confidence,
-                pattern: `Break ${currentStreak.type}-streak (${currentStreak.length})`
-            };
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'No significant streak' };
-    }
-
-    // Method 2: Alternating Pattern Analysis
-    analyzeAlternatingPattern(history) {
-        if (history.length < 4) return { predicted: null, confidence: 0, pattern: 'Need more data' };
-        
-        let alternatingCount = 0;
-        for (let i = 1; i < Math.min(history.length, 6); i++) {
-            if (history[history.length - i] !== history[history.length - i - 1]) {
-                alternatingCount++;
-            } else {
-                break;
-            }
-        }
-        
-        if (alternatingCount >= 3) {
-            const lastResult = history[history.length - 1];
-            const nextResult = lastResult === 'B' ? 'P' : 'B';
-            const confidence = Math.min(82, 65 + (alternatingCount * 3));
-            
-            return {
-                predicted: nextResult,
-                confidence: confidence,
-                pattern: `Alternating pattern (${alternatingCount + 1})`
-            };
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'No alternating pattern' };
-    }
-
-    // Method 3: Choppy Pattern Analysis
-    analyzeChoppyPattern(history) {
-        if (history.length < 6) return { predicted: null, confidence: 0, pattern: 'Need more data' };
-        
-        const recent = history.slice(-6);
-        const streaks = this.getStreakLengths(recent);
-        const avgStreakLength = streaks.reduce((a, b) => a + b, 0) / streaks.length;
-        
-        if (avgStreakLength <= 1.5) {
-            const lastResult = history[history.length - 1];
-            const nextResult = lastResult === 'B' ? 'P' : 'B';
-            const confidence = 75;
-            
-            return {
-                predicted: nextResult,
-                confidence: confidence,
-                pattern: 'Choppy table trend'
-            };
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'Not choppy' };
-    }
-
-    // Method 4: Bias Pattern Analysis
-    analyzeBiasPattern(history) {
-        if (history.length < 10) return { predicted: null, confidence: 0, pattern: 'Need more data' };
-        
-        const recent = history.slice(-20);
-        const bCount = recent.filter(r => r === 'B').length;
-        const pCount = recent.filter(r => r === 'P').length;
-        const total = bCount + pCount;
-        
-        const bRatio = bCount / total;
-        const bias = Math.abs(bRatio - 0.5);
-        
-        if (bias > 0.15) {
-            const dominantSide = bRatio > 0.5 ? 'B' : 'P';
-            const confidence = Math.min(80, 60 + (bias * 100));
-            
-            return {
-                predicted: dominantSide,
-                confidence: confidence,
-                pattern: `${dominantSide} bias (${Math.round(bRatio * 100)}%)`
-            };
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'No significant bias' };
-    }
-
-    // Method 5: Double Pattern Analysis
-    analyzeDoublePattern(history) {
-        if (history.length < 4) return { predicted: null, confidence: 0, pattern: 'Need more data' };
-        
-        const patterns = ['BB', 'PP', 'BP', 'PB'];
-        const recent = history.slice(-10);
-        const patternCounts = {};
-        
-        patterns.forEach(pattern => patternCounts[pattern] = 0);
-        
-        for (let i = 0; i < recent.length - 1; i++) {
-            const pattern = recent[i] + recent[i + 1];
-            if (patternCounts[pattern] !== undefined) {
-                patternCounts[pattern]++;
-            }
-        }
-        
-        const lastTwo = history.slice(-2).join('');
-        if (patternCounts[lastTwo] >= 2) {
-            const nextChar = this.predictNextFromDouble(lastTwo, patternCounts);
-            if (nextChar) {
-                return {
-                    predicted: nextChar,
-                    confidence: 72,
-                    pattern: `Double pattern: ${lastTwo}→${nextChar}`
-                };
-            }
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'No double pattern' };
-    }
-
-    // Method 6: Momentum Pattern Analysis
-    analyzeMomentumPattern(history) {
-        if (history.length < 8) return { predicted: null, confidence: 0, pattern: 'Need more data' };
-        
-        const recent = history.slice(-8);
-        const momentum = this.calculateMomentum(recent);
-        
-        if (Math.abs(momentum) > 0.3) {
-            const predicted = momentum > 0 ? 'B' : 'P';
-            const confidence = Math.min(78, 65 + Math.abs(momentum) * 30);
-            
-            return {
-                predicted: predicted,
-                confidence: confidence,
-                pattern: `${predicted} momentum (${momentum.toFixed(2)})`
-            };
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'No momentum' };
-    }
-
-    // Method 7: Mean Reversion Pattern
-    analyzeMeanReversionPattern(history) {
-        if (history.length < 12) return { predicted: null, confidence: 0, pattern: 'Need more data' };
-        
-        const recent = history.slice(-12);
-        const bCount = recent.filter(r => r === 'B').length;
-        const deviation = (bCount / recent.length) - 0.5;
-        
-        if (Math.abs(deviation) > 0.25) {
-            const predicted = deviation > 0 ? 'P' : 'B';
-            const confidence = Math.min(76, 60 + Math.abs(deviation) * 60);
-            
-            return {
-                predicted: predicted,
-                confidence: confidence,
-                pattern: 'Mean reversion signal'
-            };
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'No reversion signal' };
-    }
-
-    // Method 8: Last Result Pattern
-    analyzeLastResultPattern(history) {
-        if (history.length < 2) return { predicted: null, confidence: 0, pattern: 'Need more data' };
-        
-        const lastResult = history[history.length - 1];
-        const opposite = lastResult === 'B' ? 'P' : 'B';
-        
-        return {
-            predicted: opposite,
-            confidence: 55,
-            pattern: `Opposite of last (${lastResult})`
-        };
-    }
-
-    // Method 9: Zigzag Pattern Analysis
-    analyzeZigzagPattern(history) {
-        if (history.length < 6) return { predicted: null, confidence: 0, pattern: 'Need more data' };
-        
-        const zigzagScore = this.calculateZigzagScore(history.slice(-8));
-        
-        if (zigzagScore > 0.7) {
-            const lastResult = history[history.length - 1];
-            const predicted = lastResult === 'B' ? 'P' : 'B';
-            
-            return {
-                predicted: predicted,
-                confidence: Math.min(80, 65 + zigzagScore * 15),
-                pattern: `Zigzag pattern (${zigzagScore.toFixed(2)})`
-            };
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'No zigzag pattern' };
-    }
-
-    // Method 10: Frequency Analysis
-    analyzeFrequencyPattern(history) {
-        if (history.length < 15) return { predicted: null, confidence: 0, pattern: 'Need more data' };
-        
-        const freqAnalysis = this.performFrequencyAnalysis(history.slice(-30));
-        
-        if (freqAnalysis.confidence > 70) {
-            return {
-                predicted: freqAnalysis.predicted,
-                confidence: freqAnalysis.confidence,
-                pattern: `Frequency analysis: ${freqAnalysis.pattern}`
-            };
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'No frequency pattern' };
-    }
-
-    // Advanced Method 11: Advanced Streak Analysis
-    analyzeAdvancedStreakPattern(history) {
-        if (history.length < 10) return { predicted: null, confidence: 0, pattern: 'Need more data' };
-        
-        const streakStats = this.getAdvancedStreakStats(history);
-        
-        if (streakStats.prediction) {
-            return {
-                predicted: streakStats.prediction,
-                confidence: streakStats.confidence,
-                pattern: `Advanced streak: ${streakStats.pattern}`
-            };
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'No advanced streak pattern' };
-    }
-
-    // Advanced Method 12: Pattern Recognition
-    analyzePatternRecognition(history) {
-        if (history.length < 8) return { predicted: null, confidence: 0, pattern: 'Need more data' };
-        
-        const patterns = this.recognizePatterns(history);
-        
-        if (patterns.bestMatch && patterns.confidence > 70) {
-            return {
-                predicted: patterns.predicted,
-                confidence: patterns.confidence,
-                pattern: `Pattern: ${patterns.bestMatch}`
-            };
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'No recognizable pattern' };
-    }
-
-    // Advanced Method 13: Consecutive Failure Correction
-    analyzeConsecutiveFailureCorrection(history) {
-        // This method uses external failure tracking
-        const failureRate = this.getRecentFailureRate();
-        
-        if (failureRate > 0.6) {
-            const contrarian = this.getContrarianPrediction(history);
-            return {
-                predicted: contrarian.predicted,
-                confidence: Math.min(85, 70 + failureRate * 20),
-                pattern: 'Failure correction mode'
-            };
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'No correction needed' };
-    }
-
-    // Emergency Method 14: Emergency Pattern
-    analyzeEmergencyPattern(history) {
-        const emergencySignal = this.detectEmergencySignal(history);
-        
-        if (emergencySignal.active) {
-            return {
-                predicted: emergencySignal.predicted,
-                confidence: 88,
-                pattern: 'Emergency pattern detected'
-            };
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'No emergency signal' };
-    }
-
-    // Advanced Method 15: Hot/Cold Analysis
-    analyzeHotColdPattern(history) {
-        if (history.length < 20) return { predicted: null, confidence: 0, pattern: 'Need more data' };
-        
-        const hotCold = this.analyzeHotColdStreaks(history);
-        
-        if (hotCold.signal) {
-            return {
-                predicted: hotCold.predicted,
-                confidence: hotCold.confidence,
-                pattern: `Hot/Cold: ${hotCold.pattern}`
-            };
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'No hot/cold pattern' };
-    }
-
-    // Advanced Method 16: Cyclic Pattern Analysis
-    analyzeCyclicPattern(history) {
-        if (history.length < 12) return { predicted: null, confidence: 0, pattern: 'Need more data' };
-        
-        const cyclic = this.detectCyclicPatterns(history);
-        
-        if (cyclic.detected) {
-            return {
-                predicted: cyclic.predicted,
-                confidence: cyclic.confidence,
-                pattern: `Cyclic: ${cyclic.cycle}`
-            };
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'No cyclic pattern' };
-    }
-
-    // Advanced Method 17: Probability Matrix
-    analyzeProbabilityMatrix(history) {
-        if (history.length < 15) return { predicted: null, confidence: 0, pattern: 'Need more data' };
-        
-        const matrix = this.buildProbabilityMatrix(history);
-        const prediction = this.matrixPredict(matrix, history);
-        
-        if (prediction.confidence > 70) {
-            return {
-                predicted: prediction.result,
-                confidence: prediction.confidence,
-                pattern: 'Probability matrix'
-            };
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'Matrix inconclusive' };
-    }
-
-    // Advanced Method 18: Trend Reversal Detection
-    analyzeTrendReversal(history) {
-        if (history.length < 10) return { predicted: null, confidence: 0, pattern: 'Need more data' };
-        
-        const reversal = this.detectTrendReversal(history);
-        
-        if (reversal.detected) {
-            return {
-                predicted: reversal.predicted,
-                confidence: reversal.confidence,
-                pattern: `Trend reversal: ${reversal.type}`
-            };
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'No reversal signal' };
-    }
-
-    // Ultra-Advanced Method 19: Neural Network Simulation
-    analyzeNeuralNetwork(history) {
-        if (history.length < 8) return { predicted: null, confidence: 0, pattern: 'Need more data' };
-        
-        const prediction = this.neuralNetworkPredict(history);
-        
-        if (prediction.confidence > 75) {
-            return {
-                predicted: prediction.result,
-                confidence: prediction.confidence,
-                pattern: 'Neural network'
-            };
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'Neural network uncertain' };
-    }
-
-    // Ultra-Advanced Method 20: Deep Pattern Analysis
-    analyzeDeepPattern(history) {
-        if (history.length < 12) return { predicted: null, confidence: 0, pattern: 'Need more data' };
-        
-        const deepAnalysis = this.performDeepPatternAnalysis(history);
-        
-        if (deepAnalysis.confidence > 78) {
-            return {
-                predicted: deepAnalysis.predicted,
-                confidence: deepAnalysis.confidence,
-                pattern: `Deep pattern: ${deepAnalysis.pattern}`
-            };
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'No deep pattern' };
-    }
-
-    // Ultra-Advanced Method 21: Quantum Pattern Analysis
-    analyzeQuantumPattern(history) {
-        if (history.length < 10) return { predicted: null, confidence: 0, pattern: 'Need more data' };
-        
-        const quantum = this.quantumAnalysis(history);
-        
-        if (quantum.entanglement > 0.7) {
-            return {
-                predicted: quantum.predicted,
-                confidence: Math.min(92, 75 + quantum.entanglement * 20),
-                pattern: `Quantum entanglement (${quantum.entanglement.toFixed(2)})`
-            };
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'No quantum pattern' };
-    }
-
-    // Ultra-Advanced Method 22: Genetic Algorithm
-    analyzeGeneticAlgorithm(history) {
-        if (history.length < 15) return { predicted: null, confidence: 0, pattern: 'Need more data' };
-        
-        const genetic = this.geneticAlgorithmPredict(history);
-        
-        if (genetic.fitness > 0.8) {
-            return {
-                predicted: genetic.predicted,
-                confidence: Math.min(89, 70 + genetic.fitness * 25),
-                pattern: `Genetic evolution (fitness: ${genetic.fitness.toFixed(2)})`
-            };
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'Genetic algorithm inconclusive' };
-    }
-
-    // Ultra-Advanced Method 23: Markov Chain Analysis
-    analyzeMarkovChain(history) {
-        if (history.length < 12) return { predicted: null, confidence: 0, pattern: 'Need more data' };
-        
-        const markov = this.markovChainAnalysis(history);
-        
-        if (markov.probability > 0.65) {
-            return {
-                predicted: markov.predicted,
-                confidence: Math.min(87, 60 + markov.probability * 40),
-                pattern: `Markov chain (p=${markov.probability.toFixed(2)})`
-            };
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'Markov chain uncertain' };
-    }
-
-    // Ultra-Advanced Method 24: Bayesian Inference
-    analyzeBayesianInference(history) {
-        if (history.length < 10) return { predicted: null, confidence: 0, pattern: 'Need more data' };
-        
-        const bayesian = this.bayesianInference(history);
-        
-        if (bayesian.posterior > 0.7) {
-            return {
-                predicted: bayesian.predicted,
-                confidence: Math.min(85, 65 + bayesian.posterior * 30),
-                pattern: `Bayesian inference (${bayesian.posterior.toFixed(2)})`
-            };
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'Bayesian uncertain' };
-    }
-
-    // Ultra-Advanced Method 25: Fourier Transform Analysis
-    analyzeFourierTransform(history) {
-        if (history.length < 16) return { predicted: null, confidence: 0, pattern: 'Need more data' };
-        
-        const fourier = this.fourierAnalysis(history);
-        
-        if (fourier.amplitude > 0.6) {
-            return {
-                predicted: fourier.predicted,
-                confidence: Math.min(83, 68 + fourier.amplitude * 25),
-                pattern: `Fourier frequency (${fourier.frequency})`
-            };
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'No Fourier pattern' };
-    }
-
-    // Ultra-Advanced Method 26: Sequence Matching
-    analyzeSequenceMatching(history) {
-        if (history.length < 8) return { predicted: null, confidence: 0, pattern: 'Need more data' };
-        
-        const sequence = this.findBestSequenceMatch(history);
-        
-        if (sequence.similarity > 0.75) {
-            return {
-                predicted: sequence.predicted,
-                confidence: Math.min(86, 70 + sequence.similarity * 20),
-                pattern: `Sequence match (${sequence.similarity.toFixed(2)})`
-            };
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'No sequence match' };
-    }
-
-    // Ultra-Advanced Method 27: Time Series Analysis
-    analyzeTimeSeriesAnalysis(history) {
-        if (history.length < 20) return { predicted: null, confidence: 0, pattern: 'Need more data' };
-        
-        const timeSeries = this.timeSeriesPredict(history);
-        
-        if (timeSeries.trend_strength > 0.65) {
-            return {
-                predicted: timeSeries.predicted,
-                confidence: Math.min(84, 66 + timeSeries.trend_strength * 28),
-                pattern: `Time series trend (${timeSeries.trend_strength.toFixed(2)})`
-            };
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'No time series pattern' };
-    }
-
-    // Ultra-Advanced Method 28: Cluster Analysis
-    analyzeClusterAnalysis(history) {
-        if (history.length < 25) return { predicted: null, confidence: 0, pattern: 'Need more data' };
-        
-        const cluster = this.performClusterAnalysis(history);
-        
-        if (cluster.cohesion > 0.7) {
-            return {
-                predicted: cluster.predicted,
-                confidence: Math.min(88, 72 + cluster.cohesion * 20),
-                pattern: `Cluster analysis (cohesion: ${cluster.cohesion.toFixed(2)})`
-            };
-        }
-        
-        return { predicted: null, confidence: 0, pattern: 'No cluster pattern' };
-    }
-
-    // Helper methods implementation
-    getCurrentStreak(history) {
-        if (history.length === 0) return { type: null, length: 0 };
-        
-        const lastResult = history[history.length - 1];
-        let streakLength = 1;
-        
-        for (let i = history.length - 2; i >= 0; i--) {
-            if (history[i] === lastResult) {
-                streakLength++;
-            } else {
-                break;
-            }
-        }
-        
-        return { type: lastResult, length: streakLength };
-    }
-
-    getStreakHistory(history) {
-        const streaks = [];
-        let currentStreak = { type: history[0], length: 1 };
-        
-        for (let i = 1; i < history.length; i++) {
-            if (history[i] === currentStreak.type) {
-                currentStreak.length++;
-            } else {
-                streaks.push({ ...currentStreak });
-                currentStreak = { type: history[i], length: 1 };
-            }
-        }
-        streaks.push(currentStreak);
-        
-        return streaks;
-    }
-
-    getStreakLengths(sequence) {
-        const streaks = [];
-        let currentLength = 1;
-        
-        for (let i = 1; i < sequence.length; i++) {
-            if (sequence[i] === sequence[i - 1]) {
-                currentLength++;
-            } else {
-                streaks.push(currentLength);
-                currentLength = 1;
-            }
-        }
-        streaks.push(currentLength);
-        
-        return streaks;
-    }
-
-    predictNextFromDouble(pattern, counts) {
-        const possibilities = {
-            'BB': ['B', 'P'],
-            'PP': ['P', 'B'],
-            'BP': ['B', 'P'],
-            'PB': ['P', 'B']
-        };
-        
-        if (!possibilities[pattern]) return null;
-        
-        // Simple prediction based on frequency
-        const nextB = pattern + 'B';
-        const nextP = pattern + 'P';
-        
-        const bCount = counts[nextB] || 0;
-        const pCount = counts[nextP] || 0;
-        
-        return bCount > pCount ? 'B' : 'P';
-    }
-
-    calculateMomentum(sequence) {
-        let momentum = 0;
-        const weights = [0.4, 0.3, 0.2, 0.1]; // Recent results have more weight
-        
-        for (let i = 0; i < Math.min(sequence.length, 4); i++) {
-            const result = sequence[sequence.length - 1 - i];
-            const value = result === 'B' ? 1 : -1;
-            momentum += value * weights[i];
-        }
-        
-        return momentum;
-    }
-
-    calculateZigzagScore(sequence) {
-        let changes = 0;
-        for (let i = 1; i < sequence.length; i++) {
-            if (sequence[i] !== sequence[i - 1]) {
-                changes++;
-            }
-        }
-        return changes / (sequence.length - 1);
-    }
-
-    performFrequencyAnalysis(history) {
-        const patterns = {};
-        const patternLength = 3;
-        
-        for (let i = 0; i <= history.length - patternLength; i++) {
-            const pattern = history.slice(i, i + patternLength).join('');
-            patterns[pattern] = (patterns[pattern] || 0) + 1;
-        }
-        
-        const recent = history.slice(-patternLength + 1).join('');
-        const matches = Object.keys(patterns).filter(p => p.startsWith(recent));
-        
-        if (matches.length > 0) {
-            const predictions = { B: 0, P: 0 };
-            matches.forEach(match => {
-                const lastChar = match[match.length - 1];
-                predictions[lastChar] += patterns[match];
-            });
-            
-            const total = predictions.B + predictions.P;
-            if (total > 0) {
-                const bProb = predictions.B / total;
-                const predicted = bProb > 0.5 ? 'B' : 'P';
-                const confidence = Math.max(bProb, 1 - bProb) * 100;
-                
-                return {
-                    predicted: predicted,
-                    confidence: Math.min(85, confidence),
-                    pattern: `Pattern: ${recent}→${predicted}`
-                };
-            }
-        }
-        
-        return { confidence: 0 };
-    }
-
-    // Advanced analysis methods (simplified implementations)
-    getAdvancedStreakStats(history) {
-        const streaks = this.getStreakHistory(history);
-        const avgLength = streaks.reduce((sum, s) => sum + s.length, 0) / streaks.length;
-        
-        if (avgLength > 2.5) {
-            const current = this.getCurrentStreak(history);
-            if (current.length >= avgLength) {
-                return {
-                    prediction: current.type === 'B' ? 'P' : 'B',
-                    confidence: 78,
-                    pattern: `Break expected (avg: ${avgLength.toFixed(1)})`
-                };
-            }
-        }
-        
-        return {};
-    }
-
-    recognizePatterns(history) {
-        const commonPatterns = ['BPBP', 'PBPB', 'BBPP', 'PPBB', 'BBBP', 'PPPB'];
-        const recent = history.slice(-6).join('');
-        
-        for (const pattern of commonPatterns) {
-            if (recent.includes(pattern.slice(0, -1))) {
-                const nextChar = pattern[pattern.length - 1];
-                return {
-                    predicted: nextChar,
-                    confidence: 75,
-                    bestMatch: pattern
-                };
-            }
-        }
-        
-        return {};
-    }
-
-    getRecentFailureRate() {
-        return Math.min(this.recentPerformance.length > 0 ? 
-            this.recentPerformance.filter(p => !p.correct).length / this.recentPerformance.length : 0, 1);
-    }
-
-    getContrarianPrediction(history) {
-        const lastResult = history[history.length - 1];
-        return { predicted: lastResult === 'B' ? 'P' : 'B' };
-    }
-
-    detectEmergencySignal(history) {
-        const recentFails = this.getRecentFailureRate();
-        if (recentFails > 0.7) {
-            return {
-                active: true,
-                predicted: Math.random() > 0.5 ? 'B' : 'P' // Emergency random
-            };
-        }
-        return { active: false };
-    }
-
-    // Placeholder implementations for ultra-advanced methods
-    analyzeHotColdStreaks(history) {
-        const recent = history.slice(-10);
-        const bCount = recent.filter(r => r === 'B').length;
-        const isHot = bCount > 7 || bCount < 3;
-        
-        if (isHot) {
-            return {
-                signal: true,
-                predicted: bCount > 7 ? 'P' : 'B',
-                confidence: 74,
-                pattern: bCount > 7 ? 'B hot, expect P' : 'B cold, expect B'
-            };
-        }
-        
-        return { signal: false };
-    }
-
-    detectCyclicPatterns(history) {
-        const cycles = [3, 4, 5, 6];
-        
-        for (const cycle of cycles) {
-            if (this.checkCycle(history, cycle)) {
-                const position = history.length % cycle;
-                const predicted = this.predictFromCycle(history, cycle, position);
-                
-                return {
-                    detected: true,
-                    predicted: predicted,
-                    confidence: 79,
-                    cycle: `${cycle}-step cycle`
-                };
-            }
-        }
-        
-        return { detected: false };
-    }
-
-    checkCycle(history, length) {
-        if (history.length < length * 2) return false;
-        
-        const pattern1 = history.slice(-length);
-        const pattern2 = history.slice(-length * 2, -length);
-        
-        return pattern1.join('') === pattern2.join('');
-    }
-
-    predictFromCycle(history, cycle, position) {
-        const cyclePattern = history.slice(-cycle);
-        return cyclePattern[position % cycle];
-    }
-
-    buildProbabilityMatrix(history) {
-        const matrix = { 'B': { 'B': 0, 'P': 0 }, 'P': { 'B': 0, 'P': 0 } };
-        
-        for (let i = 0; i < history.length - 1; i++) {
-            const current = history[i];
-            const next = history[i + 1];
-            matrix[current][next]++;
-        }
-        
-        return matrix;
-    }
-
-    matrixPredict(matrix, history) {
-        const last = history[history.length - 1];
-        const total = matrix[last]['B'] + matrix[last]['P'];
-        
-        if (total > 0) {
-            const bProb = matrix[last]['B'] / total;
-            return {
-                result: bProb > 0.5 ? 'B' : 'P',
-                confidence: Math.max(bProb, 1 - bProb) * 100
-            };
-        }
-        
-        return { confidence: 0 };
-    }
-
-    detectTrendReversal(history) {
-        const recent = history.slice(-8);
-        const momentum = this.calculateMomentum(recent);
-        const previousMomentum = this.calculateMomentum(history.slice(-12, -4));
-        
-        if (momentum * previousMomentum < 0 && Math.abs(momentum - previousMomentum) > 0.5) {
-            return {
-                detected: true,
-                predicted: momentum > 0 ? 'B' : 'P',
-                confidence: 81,
-                type: 'momentum reversal'
-            };
-        }
-        
-        return { detected: false };
-    }
-
-    // Ultra-advanced method implementations (simplified)
-    neuralNetworkPredict(history) {
-        const inputs = history.slice(-5).map(r => r === 'B' ? 1 : 0);
-        const weights = [0.3, 0.25, 0.2, 0.15, 0.1];
-        
-        const output = inputs.reduce((sum, input, i) => sum + input * weights[i], 0);
-        
-        return {
-            result: output > 0.5 ? 'B' : 'P',
-            confidence: Math.min(90, 70 + Math.abs(output - 0.5) * 40)
-        };
-    }
-
-    performDeepPatternAnalysis(history) {
-        const patterns = this.extractDeepPatterns(history);
-        const bestPattern = patterns.reduce((best, current) => 
-            current.strength > best.strength ? current : best, { strength: 0 });
-        
-        if (bestPattern.strength > 0.7) {
-            return {
-                predicted: bestPattern.predicted,
-                confidence: Math.min(85, 70 + bestPattern.strength * 20),
-                pattern: bestPattern.name
-            };
-        }
-        
-        return { confidence: 0 };
-    }
-
-    extractDeepPatterns(history) {
-        // Simplified deep pattern extraction
-        return [
-            { name: 'fibonacci', strength: Math.random(), predicted: 'B' },
-            { name: 'golden-ratio', strength: Math.random(), predicted: 'P' }
-        ];
-    }
-
-    quantumAnalysis(history) {
-        // Simplified quantum entanglement simulation
-        const entanglement = this.calculateQuantumEntanglement(history);
-        
-        return {
-            entanglement: entanglement,
-            predicted: entanglement > 0.5 ? 'B' : 'P'
-        };
-    }
-
-    calculateQuantumEntanglement(history) {
-        // Simplified quantum correlation calculation
-        const pairs = [];
-        for (let i = 0; i < history.length - 1; i += 2) {
-            if (i + 1 < history.length) {
-                pairs.push([history[i], history[i + 1]]);
-            }
-        }
-        
-        const correlation = pairs.filter(pair => pair[0] !== pair[1]).length / pairs.length;
-        return Math.min(1, correlation * 1.5);
-    }
-
-    geneticAlgorithmPredict(history) {
-        const fitness = this.calculateGeneticFitness(history);
-        
-        return {
-            predicted: fitness > 0.5 ? 'B' : 'P',
-            fitness: fitness
-        };
-    }
-
-    calculateGeneticFitness(history) {
-        // Simplified genetic algorithm fitness
-        const diversity = new Set(history.slice(-10)).size / Math.min(history.length, 10);
-        return Math.min(1, diversity * 1.2);
-    }
-
-    markovChainAnalysis(history) {
-        const transitions = this.buildMarkovChain(history);
-        const lastState = history[history.length - 1];
-        
-        const probability = transitions[lastState] || { B: 0.5, P: 0.5 };
-        
-        return {
-            predicted: probability.B > probability.P ? 'B' : 'P',
-            confidence: Math.max(probability.B, probability.P)
-        };
-    }
-
-    buildMarkovChain(history) {
-        const transitions = { 'B': { 'B': 0, 'P': 0 }, 'P': { 'B': 0, 'P': 0 } };
-        
-        for (let i = 0; i < history.length - 1; i++) {
-            transitions[history[i]][history[i + 1]]++;
-        }
-        
-        // Normalize
-        ['B', 'P'].forEach(state => {
-            const total = transitions[state]['B'] + transitions[state]['P'];
-            if (total > 0) {
-                transitions[state]['B'] /= total;
-                transitions[state]['P'] /= total;
-            }
-        });
-        
-        return transitions;
-    }
-
-    bayesianInference(history) {
-        const prior = 0.5; // Equal probability
-        const likelihood = this.calculateLikelihood(history);
-        const posterior = (likelihood * prior) / 0.5; // Simplified
-        
-        return {
-            predicted: posterior > 0.5 ? 'B' : 'P',
-            posterior: Math.min(1, posterior)
-        };
-    }
-
-    calculateLikelihood(history) {
-        const recent = history.slice(-5);
-        const bCount = recent.filter(r => r === 'B').length;
-        return bCount / recent.length;
-    }
-
-    fourierAnalysis(history) {
-        // Simplified Fourier transform
-        const signal = history.map(r => r === 'B' ? 1 : -1);
-        const dominant = this.findDominantFrequency(signal);
-        
-        return {
-            predicted: dominant.phase > 0 ? 'B' : 'P',
-            amplitude: dominant.amplitude,
-            frequency: dominant.frequency
-        };
-    }
-
-    findDominantFrequency(signal) {
-        // Simplified frequency analysis
-        let maxAmplitude = 0;
-        let dominantFreq = 1;
-        
-        for (let freq = 1; freq <= signal.length / 2; freq++) {
-            const amplitude = this.calculateAmplitude(signal, freq);
-            if (amplitude > maxAmplitude) {
-                maxAmplitude = amplitude;
-                dominantFreq = freq;
-            }
-        }
-        
-        return {
-            amplitude: maxAmplitude,
-            frequency: dominantFreq,
-            phase: Math.random() > 0.5 ? 1 : -1
-        };
-    }
-
-    calculateAmplitude(signal, frequency) {
-        // Simplified amplitude calculation
-        let real = 0, imag = 0;
-        
-        for (let i = 0; i < signal.length; i++) {
-            const angle = 2 * Math.PI * frequency * i / signal.length;
-            real += signal[i] * Math.cos(angle);
-            imag += signal[i] * Math.sin(angle);
-        }
-        
-        return Math.sqrt(real * real + imag * imag) / signal.length;
-    }
-
-    findBestSequenceMatch(history) {
-        const currentSeq = history.slice(-4);
-        let bestMatch = { similarity: 0, predicted: 'B' };
-        
-        for (let i = 0; i <= history.length - 5; i++) {
-            const compareSeq = history.slice(i, i + 4);
-            const similarity = this.calculateSimilarity(currentSeq, compareSeq);
-            
-            if (similarity > bestMatch.similarity) {
-                bestMatch = {
-                    similarity: similarity,
-                    predicted: history[i + 4] || 'B'
-                };
-            }
-        }
-        
-        return bestMatch;
-    }
-
-    calculateSimilarity(seq1, seq2) {
-        let matches = 0;
-        for (let i = 0; i < Math.min(seq1.length, seq2.length); i++) {
-            if (seq1[i] === seq2[i]) matches++;
-        }
-        return matches / Math.max(seq1.length, seq2.length);
-    }
-
-    timeSeriesPredict(history) {
-        const trend = this.calculateTrend(history);
-        
-        return {
-            predicted: trend.direction > 0 ? 'B' : 'P',
-            trend_strength: Math.abs(trend.direction)
-        };
-    }
-
-    calculateTrend(history) {
-        const values = history.map(r => r === 'B' ? 1 : 0);
-        const n = values.length;
-        
-        let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
-        
-        for (let i = 0; i < n; i++) {
-            sumX += i;
-            sumY += values[i];
-            sumXY += i * values[i];
-            sumXX += i * i;
-        }
-        
-        const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
-        
-        return {
-            direction: slope,
-            strength: Math.abs(slope)
-        };
-    }
-
-    performClusterAnalysis(history) {
-        const clusters = this.createClusters(history);
-        const cohesion = this.calculateClusterCohesion(clusters);
-        
-        return {
-            predicted: clusters.dominant === 'B' ? 'B' : 'P',
-            cohesion: cohesion
-        };
-    }
-
-    createClusters(history) {
-        const segments = [];
-        const segmentSize = 5;
-        
-        for (let i = 0; i <= history.length - segmentSize; i += segmentSize) {
-            const segment = history.slice(i, i + segmentSize);
-            const bCount = segment.filter(r => r === 'B').length;
-            segments.push({ type: bCount > 2 ? 'B' : 'P', strength: Math.abs(bCount - 2.5) });
-        }
-        
-        const bClusters = segments.filter(s => s.type === 'B').length;
-        const pClusters = segments.filter(s => s.type === 'P').length;
-        
-        return {
-            dominant: bClusters > pClusters ? 'B' : 'P',
-            segments: segments
-        };
-    }
-
-    calculateClusterCohesion(clusters) {
-        const avgStrength = clusters.segments.reduce((sum, s) => sum + s.strength, 0) / clusters.segments.length;
-        return Math.min(1, avgStrength / 2.5);
-    }
-
-    // Public methods for external use
-    updatePerformance(prediction, actual, isCorrect) {
-        // Track predictions
-        this.lastPredictions.push(prediction);
-        if (this.lastPredictions.length > 10) {
-            this.lastPredictions.shift();
-        }
-        
-        // Update consecutive failure count
-        if (isCorrect) {
-            this.consecutiveFailureCount = 0;
-            this.emergencyMode = false;
+// Ultimate Baccarat AI: Multi-Strategy Professional Predictor
+// Sử dụng nhiều thuật toán mạnh nhất: Streak, Chop, Pattern, Dynamic Prob, Consensus
+
+class UltimateBaccaratAI {
+    detectUltraLocalBias(history) {
+        // Bias cực ngắn 4-6 hand gần nhất
+        for (let w of [4,5,6]) {
+            let recent = history.slice(-w).filter(x=>x!=='T');
+            let b = recent.filter(x=>x==='B').length;
+            let p = recent.filter(x=>x==='P').length;
+            let total = b+p;
+            if (total < 3) continue;
+            if (b/total > 0.66) return 'B';
+            if (p/total > 0.66) return 'P';
+        }
+        return null;
+    }
+    detectMajorityBias(history, biasType, strict=true) {
+        // Nếu bias chiếm đa số trong 5-7 hand gần nhất (kể cả alternating/tie xen kẽ)
+        let arr = history.filter(x=>x!=='T');
+        let last7 = arr.slice(-7);
+        let last5 = arr.slice(-5);
+        let count7 = last7.filter(x=>x===biasType).length;
+        let count5 = last5.filter(x=>x===biasType).length;
+        if (strict) {
+            if (count7 >= 5 || count5 >= 4) return true;
         } else {
-            this.consecutiveFailureCount++;
-            // Add to recent failures
-            this.recentFailures.push({
-                prediction: prediction,
-                actual: actual,
-                timestamp: Date.now()
-            });
-            
-            // Keep only last 5 failures
-            if (this.recentFailures.length > 5) {
-                this.recentFailures.shift();
-            }
+            if (count7 >= 4 || count5 >= 3) return true;
         }
-        
-        // Original update logic
-        this.recentPerformance.push({
-            prediction: prediction,
-            actual: actual,
-            correct: isCorrect,
-            timestamp: Date.now()
-        });
-        
-        // Keep only last 50 predictions
-        if (this.recentPerformance.length > 50) {
-            this.recentPerformance.shift();
-        }
-        
-        // Update neural weights (simplified)
-        this.updateNeuralWeightsSimple(prediction, actual, isCorrect);
-        
-        // Adaptive weight adjustment based on consecutive failures
-        this.adjustAdaptiveWeights(isCorrect);
+        return false;
     }
-    
-    // Simplified neural weights update
-    updateNeuralWeightsSimple(prediction, actual, isCorrect) {
-        const learningRate = 0.1;
-        const adjustment = isCorrect ? learningRate : -learningRate;
-        
-        // Update weights based on prediction accuracy
-        Object.keys(this.adaptiveWeights).forEach(method => {
-            if (isCorrect) {
-                this.adaptiveWeights[method] = Math.min(2.0, this.adaptiveWeights[method] + 0.05);
-            } else {
-                this.adaptiveWeights[method] = Math.max(0.2, this.adaptiveWeights[method] - 0.03);
+    detectLongRunSwitch(history) {
+        // Nếu vừa có run dài (>=5) rồi đảo chiều hoặc alternating
+        let arr = history.filter(x=>x!=='T');
+        if (arr.length < 8) return false;
+        let run = 1;
+        for (let i = arr.length-1; i > 0; i--) {
+            if (arr[i] === arr[i-1]) run++;
+            else break;
+        }
+        if (run >= 5) {
+            let before = arr[arr.length-run-1];
+            let last = arr[arr.length-1];
+            if (before && before !== last) {
+                // Đảo chiều sau run dài
+                return {from: before, to: last, run};
             }
-        });
+        }
+        return false;
     }
 
-    // Apply anti-consecutive-failure filter
-    applyAntiConsecutiveFailureFilter(prediction, history) {
-        if (!prediction.predicted) return prediction;
-        
-        // If we're in emergency mode or have recent failures, apply additional checks
-        if (this.emergencyMode || this.consecutiveFailureCount > 0) {
-            // Reduce confidence if we've had failures
-            const confidenceReduction = this.consecutiveFailureCount * 5;
-            prediction.confidence = Math.max(65, prediction.confidence - confidenceReduction);
-            
-            // Add safety pattern
-            prediction.pattern += ` (Safe Mode)`;
-        }
-        
-        return prediction;
+    detectLocalBias(history, window=10) {
+        // Bias local mạnh trong 8-12 hand gần nhất
+        let recent = history.slice(-window).filter(x=>x!=='T');
+        let b = recent.filter(x=>x==='B').length;
+        let p = recent.filter(x=>x==='P').length;
+        let total = b+p;
+        if (total < 6) return null;
+        if (b/total > 0.62) return 'B';
+        if (p/total > 0.62) return 'P';
+        return null;
     }
-    
-    // Adjust weights based on performance
-    adjustAdaptiveWeights(isCorrect) {
-        if (this.consecutiveFailureCount >= 2) {
-            // Reduce all weights when failing consecutively
-            Object.keys(this.adaptiveWeights).forEach(method => {
-                this.adaptiveWeights[method] = Math.max(0.1, this.adaptiveWeights[method] * 0.8);
-            });
-            
-            // Boost emergency and conservative methods
-            this.adaptiveWeights.emergencyPattern = Math.min(2.0, this.adaptiveWeights.emergencyPattern * 1.5);
-            this.adaptiveWeights.consecutiveCorrection = Math.min(2.0, this.adaptiveWeights.consecutiveCorrection * 1.5);
-            this.adaptiveWeights.lastResult = Math.min(2.0, this.adaptiveWeights.lastResult * 1.3);
-            
-        } else if (isCorrect) {
-            // Gradually restore weights when succeeding
-            Object.keys(this.adaptiveWeights).forEach(method => {
-                this.adaptiveWeights[method] = Math.min(2.0, this.adaptiveWeights[method] * 1.05);
-            });
+    detectAlternatingTiePattern(history) {
+        // Nhận diện tie xen kẽ đều (B T B T, P T P T, ...)
+        if (history.length < 6) return false;
+        let arr = history.slice(-6);
+        // Pattern: X T X T X T hoặc T X T X T X
+        let altTie1 = true, altTie2 = true;
+        for (let i = 0; i < arr.length; i++) {
+            if (i % 2 === 0 && arr[i] !== 'T') altTie1 = false;
+            if (i % 2 === 1 && arr[i] === 'T') altTie1 = false;
+            if (i % 2 === 1 && arr[i] !== 'T') altTie2 = false;
+            if (i % 2 === 0 && arr[i] === 'T') altTie2 = false;
         }
+        return altTie1 || altTie2;
     }
-    
-    // Reset all AI data
-    reset() {
-        // Reset all tracking variables
-        this.recentPerformance = [];
-        this.patternHistory = [];
-        this.methodSuccessRates = {};
-        this.neuralWeights.clear();
-        this.sequenceMemory.clear();
-        
-        // Reset anti-consecutive-failure mechanism
-        this.recentFailures = [];
-        this.consecutiveFailureCount = 0;
-        this.emergencyMode = false;
+
+    detectLooseTiePattern(history) {
+        // Nếu trong 7 hand gần nhất có >=2 tie, các tie cách nhau đúng 2 hoặc 3 hand
+        let recent = history.slice(-7);
+        let tieIdx = [];
+        for (let i=0;i<recent.length;i++) if (recent[i]==='T') tieIdx.push(i);
+        if (tieIdx.length >= 2) {
+            let diffs = tieIdx.slice(1).map((v,i)=>v-tieIdx[i]);
+            if (diffs.every(d=>d===2 || d===3)) return true;
+        }
+        return false;
+    }
+
+    detectSoftBias(history, window=16) {
+        // Bias nhẹ, bias động
+        let recent = history.slice(-window).filter(x=>x!=='T');
+        let b = recent.filter(x=>x==='B').length;
+        let p = recent.filter(x=>x==='P').length;
+        let total = b+p;
+        if (total < 8) return null;
+        if (b/total > 0.54 && b/total <= 0.58) return 'B';
+        if (p/total > 0.54 && p/total <= 0.58) return 'P';
+        return null;
+    }
+    constructor() {
+        this.patternStats = {};
+        this.fallbackRandom = () => (Math.random() < 0.5 ? 'B' : 'P');
+        this.lastResults = [];
         this.lastPredictions = [];
-        this.adaptiveConfidenceThreshold = 70;
-        
-        // Reset adaptive weights to default
-        Object.keys(this.adaptiveWeights).forEach(key => {
-            this.adaptiveWeights[key] = 1.0;
+    }
+
+    updatePatternStats(history) {
+        // Lưu pattern con độ dài 3–8
+        for (let len = 3; len <= 8; len++) {
+            for (let i = 0; i <= history.length - len - 1; i++) {
+                const pattern = history.slice(i, i + len).join('');
+                const next = history[i + len];
+                if (!this.patternStats[pattern]) this.patternStats[pattern] = {B:0, P:0, T:0};
+                this.patternStats[pattern][next] = (this.patternStats[pattern][next] || 0) + 1;
+            }
+        }
+    }
+
+    hybridPatternScore(history) {
+        // Kết hợp nhiều pattern con, tính điểm cho từng dự đoán
+        let scores = {B:0, P:0, T:0};
+        let usedPatterns = [];
+        for (let len = 8; len >= 3; len--) {
+            if (history.length < len) continue;
+            const pattern = history.slice(-len).join('');
+            if (this.patternStats[pattern]) {
+                let stats = this.patternStats[pattern];
+                for (let k of ['B','P','T']) {
+                    if (stats[k] > 0) {
+                        scores[k] += stats[k] * (len + 1); // pattern dài hơn trọng số cao hơn
+                    }
+                }
+                usedPatterns.push({pattern, stats});
+            }
+        }
+        return {scores, usedPatterns};
+    }
+
+    detectCluster(history) {
+        // Nhận diện cluster tie hoặc cluster B/P bất thường
+        let last = history[history.length-1];
+        let count = 1;
+        for (let i = history.length-2; i >= 0; i--) {
+            if (history[i] === last) count++;
+            else break;
+        }
+        if (count >= 3 && count <= 4) {
+            return {type: last, count};
+        }
+        // Cluster tie: nhiều tie liên tục
+        if (last === 'T' && count >= 2) {
+            return {type: 'T', count};
+        }
+        return null;
+    }
+
+    detectRunSwitch(history) {
+        // Nếu vừa có run dài rồi đảo chiều, dự đoán đảo chiều tiếp
+        let last = history[history.length-1];
+        let run = 1;
+        for (let i = history.length-2; i >= 0; i--) {
+            if (history[i] === 'T') continue;
+            if (history[i] === last) run++;
+            else break;
+        }
+        if (run >= 4) {
+            // Check đảo chiều
+            let before = history.filter(x=>x!=='T')[history.filter(x=>x!=='T').length-run-1];
+            if (before && before !== last) {
+                return {from: before, to: last, run};
+            }
+        }
+        return null;
+    }
+
+    detectBias(history, window=30) {
+        // Bias tổng thể và local (nhạy hơn)
+        let recent = history.slice(-window).filter(x=>x!=='T');
+        let b = recent.filter(x=>x==='B').length;
+        let p = recent.filter(x=>x==='P').length;
+        let total = b+p;
+        if (total < 10) return null;
+        if (b/total > 0.58) return 'B';
+        if (p/total > 0.58) return 'P';
+        return null;
+    }
+    detectIrregularTie(history) {
+        // Nếu trong 5-7 hand gần nhất có >=2 tie, nhưng không liên tục
+        let recent = history.slice(-7);
+        let tieIdx = [];
+        for (let i=0;i<recent.length;i++) if (recent[i]==='T') tieIdx.push(i);
+        if (tieIdx.length >= 2 && tieIdx.length <= 4) {
+            // Không phải cluster tie (không liên tục)
+            let isCluster = true;
+            for (let i=1;i<tieIdx.length;i++) if (tieIdx[i]-tieIdx[i-1]>1) isCluster = false;
+            if (!isCluster) return true;
+        }
+        return false;
+    }
+
+    detectAlternatingDeep(history) {
+        // Alternating sâu, bỏ qua tie
+        let arr = history.filter(x=>x!=='T');
+        if (arr.length < 6) return false;
+        let ok = true;
+        for (let i = arr.length-1; i > arr.length-6; i--) {
+            if (arr[i] === arr[i-1]) ok = false;
+        }
+        return ok;
+    }
+
+    detectTiePattern(history) {
+        // Nếu tie xuất hiện đều đặn (ví dụ cứ 3 hand lại có tie)
+        let tieIdx = [];
+        for (let i=0;i<history.length;i++) if (history[i]==='T') tieIdx.push(i);
+        if (tieIdx.length < 3) return null;
+        let diffs = tieIdx.slice(1).map((v,i)=>v-tieIdx[i]);
+        let avg = diffs.reduce((a,b)=>a+b,0)/diffs.length;
+        let consistent = diffs.every(d=>Math.abs(d-avg)<=1);
+        if (consistent && avg >= 2 && avg <= 5) return {avg, next: tieIdx[tieIdx.length-1]+Math.round(avg)};
+        return null;
+    }
+
+    predict(history, lastResult = null) {
+        // 0.00. Proactive: Hand đầu tiên và thứ 2 - dự đoán cực sớm, không cần pattern rõ
+        if (history.length === 1) {
+            // Nếu hand đầu là tie, dự đoán tie tiếp hoặc alternating tie
+            if (history[0] === 'T') {
+                this.lastPredictions.push('T');
+                return {
+                    predicted: 'T',
+                    confidence: 70,
+                    pattern: 'ProactiveFirstHandTie',
+                    methods: ['Proactive','FirstHandTie']
+                };
+            }
+            // Nếu hand đầu là B hoặc P, proactive alternating hoặc bias nối tiếp
+            let alt = history[0] === 'B' ? 'P' : 'B';
+            this.lastPredictions.push(alt);
+            return {
+                predicted: alt,
+                confidence: 68,
+                pattern: 'ProactiveFirstHandAlternating',
+                methods: ['Proactive','FirstHandAlternating']
+            };
+        }
+        if (history.length === 2) {
+            // Nếu vừa có 2 tie liên tiếp
+            if (history[0] === 'T' && history[1] === 'T') {
+                this.lastPredictions.push('T');
+                return {
+                    predicted: 'T',
+                    confidence: 72,
+                    pattern: 'Proactive2Tie',
+                    methods: ['Proactive','2Tie']
+                };
+            }
+            // Nếu vừa có alternating (B P hoặc P B)
+            if (history[0] !== 'T' && history[1] !== 'T' && history[0] !== history[1]) {
+                let alt = history[1] === 'B' ? 'P' : 'B';
+                this.lastPredictions.push(alt);
+                return {
+                    predicted: alt,
+                    confidence: 71,
+                    pattern: 'Proactive2HandAlternating',
+                    methods: ['Proactive','2HandAlternating']
+                };
+            }
+            // Nếu vừa có 2 giống nhau (B B hoặc P P)
+            if (history[0] !== 'T' && history[1] !== 'T' && history[0] === history[1]) {
+                this.lastPredictions.push(history[1]);
+                return {
+                    predicted: history[1],
+                    confidence: 70,
+                    pattern: 'Proactive2HandBias',
+                    methods: ['Proactive','2HandBias']
+                };
+            }
+            // Nếu có tie xen kẽ
+            if (history[0] === 'T' || history[1] === 'T') {
+                this.lastPredictions.push('T');
+                return {
+                    predicted: 'T',
+                    confidence: 69,
+                    pattern: 'Proactive2HandTie',
+                    methods: ['Proactive','2HandTie']
+                };
+            }
+        }
+        // 0.0. Proactive: Pattern cực ngắn (2 hand), bias local cực ngắn (2-3 hand), alternating 2 hand, tie cực ngắn
+        if (history.length >= 2) {
+            let last2 = history.slice(-2);
+            // Alternating 2 hand (B P hoặc P B)
+            if (last2[0] !== 'T' && last2[1] !== 'T' && last2[0] !== last2[1]) {
+                let alt = last2[1] === 'B' ? 'P' : 'B';
+                this.lastPredictions.push(alt);
+                if (this.lastPredictions.length > 20) this.lastPredictions.shift();
+                return {
+                    predicted: alt,
+                    confidence: 71,
+                    pattern: 'Proactive2HandAlternating',
+                    methods: ['Proactive','2HandAlternating']
+                };
+            }
+            // Bias local cực ngắn 2 hand (B B hoặc P P)
+            if (last2[0] !== 'T' && last2[1] !== 'T' && last2[0] === last2[1]) {
+                this.lastPredictions.push(last2[1]);
+                if (this.lastPredictions.length > 20) this.lastPredictions.shift();
+                return {
+                    predicted: last2[1],
+                    confidence: 70,
+                    pattern: 'Proactive2HandBias',
+                    methods: ['Proactive','2HandBias']
+                };
+            }
+            // Tie cực ngắn (T xuất hiện ở hand 2 hoặc 1 trong 2 hand gần nhất)
+            if (last2.includes('T')) {
+                this.lastPredictions.push('T');
+                if (this.lastPredictions.length > 20) this.lastPredictions.shift();
+                return {
+                    predicted: 'T',
+                    confidence: 69,
+                    pattern: 'Proactive2HandTie',
+                    methods: ['Proactive','2HandTie']
+                };
+            }
+        }
+        if (history.length >= 3) {
+            let last3 = history.slice(-3);
+            // Bias local cực ngắn 3 hand (2/3 cùng loại, không tính tie)
+            let b = last3.filter(x=>x==='B').length;
+            let p = last3.filter(x=>x==='P').length;
+            if (b >= 2 && last3.filter(x=>x!=='T').length >= 2) {
+                this.lastPredictions.push('B');
+                if (this.lastPredictions.length > 20) this.lastPredictions.shift();
+                return {
+                    predicted: 'B',
+                    confidence: 68,
+                    pattern: 'Proactive3HandBiasB',
+                    methods: ['Proactive','3HandBias','BiasB']
+                };
+            }
+            if (p >= 2 && last3.filter(x=>x!=='T').length >= 2) {
+                this.lastPredictions.push('P');
+                if (this.lastPredictions.length > 20) this.lastPredictions.shift();
+                return {
+                    predicted: 'P',
+                    confidence: 68,
+                    pattern: 'Proactive3HandBiasP',
+                    methods: ['Proactive','3HandBias','BiasP']
+                };
+            }
+            // Nếu vừa có 3 alternating (B P B hoặc P B P), dự đoán alternating tiếp
+            if ((last3[0] !== 'T' && last3[1] !== 'T' && last3[2] !== 'T') && last3[0] !== last3[1] && last3[1] !== last3[2] && last3[0] === last3[2]) {
+                let alt = last3[2] === 'B' ? 'P' : 'B';
+                this.lastPredictions.push(alt);
+                if (this.lastPredictions.length > 20) this.lastPredictions.shift();
+                return {
+                    predicted: alt,
+                    confidence: 70,
+                    pattern: 'Proactive3HandAlternating',
+                    methods: ['Proactive','3HandAlternating']
+                };
+            }
+            // Nếu vừa có 2 tie trong 3 hand gần nhất
+            let tieCount = last3.filter(x=>x==='T').length;
+            if (tieCount >= 2) {
+                this.lastPredictions.push('T');
+                if (this.lastPredictions.length > 20) this.lastPredictions.shift();
+                return {
+                    predicted: 'T',
+                    confidence: 69,
+                    pattern: 'Proactive3HandClusterTie',
+                    methods: ['Proactive','3HandClusterTie']
+                };
+            }
+        }
+        // Hybrid Baccarat AI: Pattern Memory Voting + AntiStreak + Alternating + Cluster + Bias + Forgotten + Adaptive Fallback
+        if (lastResult) {
+            this.lastResults.push(lastResult);
+            if (this.lastResults.length > 20) this.lastResults.shift();
+        }
+        if (history.length < 10) {
+            let pred = this.fallbackRandom();
+            this.lastPredictions.push(pred);
+            if (this.lastPredictions.length > 20) this.lastPredictions.shift();
+            return {
+                predicted: pred,
+                confidence: 52,
+                pattern: 'Random (insufficient data)',
+                methods: ['Random']
+            };
+        }
+        this.updatePatternStats(history);
+        let last3 = this.lastPredictions.slice(-3);
+        // Nếu vừa sai liên tiếp 2-3 lần, ưu tiên forgotten hoặc anti-repeat, hoặc diversity (không lặp lại 3 dự đoán gần nhất)
+        if (this.lastResults.length >= 3 && this.lastResults.slice(-3).every(x=>x===false)) {
+            let recent8 = history.slice(-8);
+            let never8 = [];
+            for (let k of ['B','P','T']) if (!recent8.includes(k)) never8.push(k);
+            if (never8.length > 0) {
+                let pred = never8[0];
+                this.lastPredictions.push(pred);
+                if (this.lastPredictions.length > 20) this.lastPredictions.shift();
+                return {
+                    predicted: pred,
+                    confidence: 64,
+                    pattern: 'ForgottenRecovery (after mistakes)',
+                    methods: ['Forgotten','MistakeAdaptive']
+                };
+            }
+            // Nếu không, chọn anti-repeat hoặc diversity
+            let pred = this.fallbackRandom();
+            if (last3.length === 3 && last3[0] === last3[1] && last3[1] === last3[2]) {
+                pred = last3[0] === 'B' ? 'P' : 'B';
+            } else if (last3.includes(pred)) {
+                pred = pred === 'B' ? 'P' : 'B';
+            }
+            this.lastPredictions.push(pred);
+            if (this.lastPredictions.length > 20) this.lastPredictions.shift();
+            return {
+                predicted: pred,
+                confidence: 56,
+                pattern: 'MistakeAdaptive AntiRepeat Diversity',
+                methods: ['MistakeAdaptive','NoRepeat','Diversity']
+            };
+        }
+        // 0. Long Run Sudden Switch: Nếu vừa có run dài rồi đảo chiều, ưu tiên bias local cực ngắn, nếu không alternating/anti-switch, nếu vừa sai liên tiếp thì fallback forgotten
+        let longRunSwitch = this.detectLongRunSwitch(history);
+        if (longRunSwitch) {
+            // Ưu tiên bias local cực ngắn (4-6 hand) nếu bias chuyển đổi mạnh
+            let ultraBias = this.detectUltraLocalBias ? this.detectUltraLocalBias(history) : null;
+            if (ultraBias) {
+                this.lastPredictions.push(ultraBias);
+                if (this.lastPredictions.length > 20) this.lastPredictions.shift();
+                return {
+                    predicted: ultraBias,
+                    confidence: 73,
+                    pattern: `LongRunSwitchUltraLocalBias(${ultraBias})`,
+                    methods: ['LongRunSwitch','UltraLocalBias','Proactive']
+                };
+            }
+            // Nếu alternating/anti-switch vừa fail liên tiếp, fallback forgotten hoặc diversity
+            if (this.lastResults.length >= 2 && this.lastResults.slice(-2).every(x=>x===false)) {
+                let recent8 = history.slice(-8);
+                let never8 = [];
+                for (let k of ['B','P','T']) if (!recent8.includes(k)) never8.push(k);
+                if (never8.length > 0) {
+                    let pred = never8[0];
+                    this.lastPredictions.push(pred);
+                    if (this.lastPredictions.length > 20) this.lastPredictions.shift();
+                    return {
+                        predicted: pred,
+                        confidence: 65,
+                        pattern: 'ForgottenRecovery (after run switch fail)',
+                        methods: ['Forgotten','RunSwitchFallback','Diversity']
+                    };
+                }
+            }
+            let arr = history.filter(x=>x!=='T');
+            let last = arr[arr.length-1];
+            let prev = arr[arr.length-2];
+            if (last !== prev) {
+                let alt = last === 'B' ? 'P' : 'B';
+                // Nếu vừa sai liên tiếp, ưu tiên diversity
+                if (this.lastResults.length >= 2 && this.lastResults.slice(-2).every(x=>x===false)) {
+                    if (last3.includes(alt)) alt = alt === 'B' ? 'P' : 'B';
+                }
+                this.lastPredictions.push(alt);
+                if (this.lastPredictions.length > 20) this.lastPredictions.shift();
+                return {
+                    predicted: alt,
+                    confidence: 66,
+                    pattern: `LongRunSwitchAlternatingProactive(${longRunSwitch.run})`,
+                    methods: ['LongRunSwitch','Alternating','Proactive','Diversity']
+                };
+            } else {
+                let anti = last === 'B' ? 'P' : 'B';
+                if (this.lastResults.length >= 2 && this.lastResults.slice(-2).every(x=>x===false)) {
+                    if (last3.includes(anti)) anti = anti === 'B' ? 'P' : 'B';
+                }
+                this.lastPredictions.push(anti);
+                if (this.lastPredictions.length > 20) this.lastPredictions.shift();
+                return {
+                    predicted: anti,
+                    confidence: 64,
+                    pattern: `LongRunSwitchAntiProactive(${longRunSwitch.run})`,
+                    methods: ['LongRunSwitch','AntiSwitch','Proactive','Diversity']
+                };
+            }
+        }
+        // 0.5. Alternating Tie Pattern (B T B T ... hoặc P T P T ...)
+        if (this.detectAlternatingTiePattern(history)) {
+            this.lastPredictions.push('T');
+            if (this.lastPredictions.length > 20) this.lastPredictions.shift();
+            return {
+                predicted: 'T',
+                confidence: 67,
+                pattern: 'AlternatingTie',
+                methods: ['AlternatingTie']
+            };
+        }
+        // 0.6. Loose Tie Pattern (tie cách đều 2 hoặc 3 hand)
+        if (this.detectLooseTiePattern(history)) {
+            this.lastPredictions.push('T');
+            if (this.lastPredictions.length > 20) this.lastPredictions.shift();
+            return {
+                predicted: 'T',
+                confidence: 63,
+                pattern: 'LooseTiePattern',
+                methods: ['LooseTie']
+            };
+        }
+        // 1. Pattern Memory Voting (ưu tiên pattern ngắn, nhận diện cực sớm, không lặp lại 3 dự đoán gần nhất)
+        let allPatterns = [];
+        for (let len = 8; len >= 3; len--) {
+            if (history.length < len) continue;
+            const pattern = history.slice(-len).join('');
+            if (this.patternStats[pattern]) {
+                let stats = this.patternStats[pattern];
+                let total = stats.B + stats.P + stats.T;
+                // Nếu pattern ngắn (3-4) và xuất hiện >=1 lần, ưu tiên dự đoán cực sớm
+                if ((len <= 4 && total >= 1) || (len > 4 && total > 1)) {
+                    allPatterns.push({pattern, stats, len, total});
+                }
+            }
+        }
+        // Ưu tiên pattern ngắn, mới xuất hiện gần nhất
+        allPatterns.sort((a,b)=>{
+            if (a.len <= 4 && b.len > 4) return -1;
+            if (a.len > 4 && b.len <= 4) return 1;
+            return b.len*1000+b.total-b.len*1000-a.total;
         });
-        
-        // Reinitialize neural weights
-        this.initializeNeuralWeights();
-        
-        console.log('🔄 AI Predictor has been reset to initial state');
+        let voting = {B:0, P:0, T:0};
+        for (let i=0;i<allPatterns.length;i++) {
+            let p = allPatterns[i];
+            // Pattern ngắn (3-4) trọng số cao hơn nếu vừa xuất hiện
+            let weight = (p.len <= 4 ? 3.5 : 1) * (p.len+1);
+            for (let k of ['B','P','T']) voting[k] += (p.stats[k]||0)*weight;
+        }
+        let sortedVoting = Object.entries(voting).sort((a,b)=>b[1]-a[1]);
+        let best = sortedVoting.find(([k])=>!last3.includes(k)) || sortedVoting[0];
+        if (best && best[1] > 0) {
+            this.lastPredictions.push(best[0]);
+            if (this.lastPredictions.length > 20) this.lastPredictions.shift();
+            return {
+                predicted: best[0],
+                confidence: 72 + Math.min(best[1], 28),
+                pattern: `PatternVoting+UltraEarlyShortPattern`,
+                methods: ['PatternMemory', 'Voting', 'UltraEarlyShortPattern']
+            };
+        }
+        // 2. AntiStreak: Nếu streak >=4 (không tính tie), đảo chiều
+        let arrNoTie = history.filter(x=>x!=='T');
+        if (arrNoTie.length >= 4) {
+            let streak = 1;
+            for (let i = arrNoTie.length-1; i > 0; i--) {
+                if (arrNoTie[i] === arrNoTie[i-1]) streak++;
+                else break;
+            }
+            if (streak >= 4) {
+                let anti = arrNoTie[arrNoTie.length-1] === 'B' ? 'P' : 'B';
+                if (!last3.includes(anti)) {
+                    this.lastPredictions.push(anti);
+                    if (this.lastPredictions.length > 20) this.lastPredictions.shift();
+                    return {
+                        predicted: anti,
+                        confidence: 72,
+                        pattern: `AntiStreak(${streak})`,
+                        methods: ['AntiStreak','StrongPattern']
+                    };
+                }
+            }
+        }
+        // 3. Alternating cực ngắn (3 hand, proactive)
+        if (arrNoTie.length >= 3) {
+            let ok = true;
+            for (let i = arrNoTie.length-1; i > arrNoTie.length-3; i--) {
+                if (arrNoTie[i] === arrNoTie[i-1]) ok = false;
+            }
+            if (ok) {
+                let alt = arrNoTie[arrNoTie.length-1] === 'B' ? 'P' : 'B';
+                if (!last3.includes(alt)) {
+                    this.lastPredictions.push(alt);
+                    if (this.lastPredictions.length > 20) this.lastPredictions.shift();
+                    return {
+                        predicted: alt,
+                        confidence: 67,
+                        pattern: 'UltraEarlyAlternating',
+                        methods: ['Alternating','UltraEarlyPattern']
+                    };
+                }
+            }
+        }
+        // 3.5. Irregular Tie: tie xuất hiện xen kẽ, không phải cluster tie
+        if (this.detectIrregularTie(history)) {
+            this.lastPredictions.push('T');
+            if (this.lastPredictions.length > 20) this.lastPredictions.shift();
+            return {
+                predicted: 'T',
+                confidence: 64,
+                pattern: 'IrregularTie',
+                methods: ['IrregularTie']
+            };
+        }
+        // 4. Cluster tie cực ngắn (2 hand liên tiếp hoặc 2/3 hand gần nhất)
+        let last = history[history.length-1];
+        let countTie = 0;
+        for (let i = history.length-1; i >= 0; i--) {
+            if (history[i] === 'T') countTie++;
+            else break;
+        }
+        if (countTie >= 2 || (history.slice(-3).filter(x=>x==='T').length >= 2)) {
+            this.lastPredictions.push('T');
+            if (this.lastPredictions.length > 20) this.lastPredictions.shift();
+            return {
+                predicted: 'T',
+                confidence: 66,
+                pattern: `UltraEarlyClusterTie(${countTie})`,
+                methods: ['ClusterTie','UltraEarlyPattern']
+            };
+        }
+        // 4.2. Ưu tiên bias mạnh tuyệt đối nếu bias chiếm đa số gần nhất
+        let biasTypes = [
+            this.detectBias(history, 10),
+            this.detectBias(history, 20),
+            this.detectBias(history, 30),
+            this.detectBias(history, 50),
+            this.detectLocalBias(history, 4),
+            this.detectLocalBias(history, 6),
+            this.detectLocalBias(history, 8),
+            this.detectLocalBias(history, 12),
+            this.detectSoftBias(history, 12),
+            this.detectSoftBias(history, 16),
+            this.detectSoftBias(history, 20)
+        ];
+        for (let biasType of biasTypes) {
+            if (biasType && this.detectMajorityBias(history, biasType)) {
+                this.lastPredictions.push(biasType);
+                if (this.lastPredictions.length > 20) this.lastPredictions.shift();
+                return {
+                    predicted: biasType,
+                    confidence: 67,
+                    pattern: `UltimateBiasMajority(${biasType})`,
+                    methods: ['Bias','MajorityBias','UltimateBias','LocalBias']
+                };
+            }
+        }
+        // 6. Forgotten Recovery: Nếu có kết quả chưa xuất hiện trong 8 hand gần nhất, ưu tiên chọn
+        let recent8_forgotten = history.slice(-8);
+        let never8_forgotten = [];
+        for (let k of ['B','P','T']) if (!recent8_forgotten.includes(k)) never8_forgotten.push(k);
+        if (never8_forgotten.length > 0) {
+            let pred = never8_forgotten[0];
+            this.lastPredictions.push(pred);
+            if (this.lastPredictions.length > 20) this.lastPredictions.shift();
+            return {
+                predicted: pred,
+                confidence: 60,
+                pattern: 'ForgottenRecovery',
+                methods: ['Forgotten']
+            };
+        }
+        // 7. Adaptive Fallback: diversity tuyệt đối, không lặp lại 2 dự đoán gần nhất, ưu tiên forgotten, anti-repeat, proactive switching
+        // Fallback tối ưu thực chiến: Ưu tiên forgotten, bias local, alternating, diversity, giảm random hóa mạnh
+        let fallbackOptions = ['B', 'P', 'T'];
+        let recent8_fallback = history.slice(-8);
+        let never8_fallback = fallbackOptions.filter(k => !recent8_fallback.includes(k));
+        let pred = null;
+        // 1. Forgotten recovery nếu có (và không trùng 2 dự đoán gần nhất)
+        if (never8_fallback.length > 0 && !last3.includes(never8_fallback[0])) {
+            pred = never8_fallback[0];
+        }
+        // 2. Ưu tiên bias local cực ngắn nếu có
+        if (!pred) {
+            let biasLocal = this.detectLocalBias(history, 4) || this.detectLocalBias(history, 6);
+            if (biasLocal && !last3.includes(biasLocal)) pred = biasLocal;
+        }
+        // 3. Alternating cực ngắn (2-3 hand)
+        if (!pred) {
+            let arr = history.filter(x=>x!=='T');
+            if (arr.length >= 3 && arr[arr.length-1] !== arr[arr.length-2] && arr[arr.length-2] !== arr[arr.length-3]) {
+                let alt = arr[arr.length-1] === 'B' ? 'P' : 'B';
+                if (!last3.includes(alt)) pred = alt;
+            }
+        }
+        // 4. Nếu vừa switching hoặc alternating liên tục, proactive đảo chiều
+        if (!pred) {
+            let arr = history.filter(x=>x!=='T');
+            if (arr.length >= 6) {
+                let last = arr[arr.length-1];
+                let prev = arr[arr.length-2];
+                let prev2 = arr[arr.length-3];
+                if ((last !== prev && prev !== prev2) || (last !== prev && arr[arr.length-4] === last)) {
+                    let alt = last === 'B' ? 'P' : 'B';
+                    if (!last3.includes(alt)) pred = alt;
+                }
+            }
+        }
+        // 5. Nếu vừa sai liên tiếp, ưu tiên forgotten hoặc đảo chiều, không random hóa mạnh
+        if (!pred && this.lastResults.length >= 2 && this.lastResults.slice(-2).every(x=>x===false)) {
+            if (never8_fallback.length > 0) pred = never8_fallback[0];
+            else {
+                let arr = history.filter(x=>x!=='T');
+                let alt = arr[arr.length-1] === 'B' ? 'P' : 'B';
+                if (!last3.includes(alt)) pred = alt;
+            }
+        }
+        // 6. Nếu vẫn chưa chọn được, diversity tuyệt đối: chọn khác 2 dự đoán gần nhất
+        if (!pred) {
+            let pool = fallbackOptions.filter(k => last3.length < 2 || k !== last3[last3.length-1]);
+            if (pool.length > 0) pred = pool[Math.floor(Math.random()*pool.length)];
+            else pred = this.fallbackRandom();
+        }
+        // 7. Không để 3 dự đoán liên tiếp giống nhau
+        if (last3.length === 3 && last3[0] === last3[1] && last3[1] === last3[2]) {
+            pred = last3[0] === 'B' ? 'P' : 'B';
+        }
+        this.lastPredictions.push(pred);
+        if (this.lastPredictions.length > 20) this.lastPredictions.shift();
+        return {
+            predicted: pred,
+            confidence: 60,
+            pattern: 'AdaptiveFallback+Practical+PatternFirst+Diversity+Forgotten+ProactiveSwitching',
+            methods: ['Pattern','NoRepeat','Diversity','Forgotten','ProactiveSwitching','BiasLocal','Alternating']
+        };
     }
 }
 
-// Export for use in main application
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = BaccaratAIPredictor;
-} else if (typeof window !== 'undefined') {
-    window.BaccaratAIPredictor = BaccaratAIPredictor;
-}
+export default UltimateBaccaratAI;
