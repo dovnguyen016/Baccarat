@@ -9,8 +9,10 @@ const resultDiv = document.getElementById('result');
 const addBankerBtn = document.getElementById('addBanker');
 const addPlayerBtn = document.getElementById('addPlayer');
 const addTieBtn = document.getElementById('addTie');
-const historyVisual = document.getElementById('history-visual');
-// Add history by button
+const removeLastBtn = document.getElementById('removeLast');
+const removeAllBtn = document.getElementById('removeAll');
+// Xóa mọi biến và hàm liên quan đến historyArr, renderHistoryVisual
+// Giữ lại các nút nhập, khi bấm sẽ cập nhật trực tiếp vào một biến historyArr và updateRoads
 let historyArr = [];
 
 if (addBankerBtn && addPlayerBtn && addTieBtn) {
@@ -27,9 +29,20 @@ if (addBankerBtn && addPlayerBtn && addTieBtn) {
         updateRoads();
     });
 }
+if (removeLastBtn) {
+    removeLastBtn.addEventListener('click', () => {
+        historyArr.pop();
+        updateRoads();
+    });
+}
+if (removeAllBtn) {
+    removeAllBtn.addEventListener('click', () => {
+        historyArr = [];
+        updateRoads();
+    });
+}
 
 function updateRoads() {
-    // Sử dụng historyArr thay vì lấy từ input
     const history = historyArr;
     // Bead Plate: 6x6
     const beadGrid = renderBeadPlate(history, 6, 6);
@@ -41,7 +54,6 @@ function updateRoads() {
     renderRoadGrid(document.getElementById('big-eye-boy'), renderEmptyRoad(6, 12));
     renderRoadGrid(document.getElementById('small-road'), renderEmptyRoad(6, 12));
     renderRoadGrid(document.getElementById('cockroach-pig'), renderEmptyRoad(6, 12));
-    renderHistoryVisual();
 }
 
 function renderRoadGrid(container, grid) {
@@ -58,17 +70,6 @@ function renderRoadGrid(container, grid) {
             container.appendChild(div);
         }
     }
-}
-
-function renderHistoryVisual() {
-    const history = historyArr;
-    historyVisual.innerHTML = '';
-    history.forEach(val => {
-        const chip = document.createElement('div');
-        chip.className = 'history-chip ' + val;
-        chip.textContent = val;
-        historyVisual.appendChild(chip);
-    });
 }
 
 predictBtn.addEventListener('click', () => {

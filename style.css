@@ -1,56 +1,16 @@
-.input-history-row {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 10px;
-}
-#history {
-    flex: 1 1 0;
-    min-width: 120px;
-}
-.history-visual {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    min-height: 32px;
-    min-width: 80px;
-    background: #181c24;
-    border-radius: 8px;
-    padding: 6px 12px;
-    align-items: center;
-    border: 1.5px solid #232a36;
-    box-shadow: 0 1px 4px #0002;
-}
-.history-chip {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 1.08em;
-    background: #232a36;
-    border: 2.5px solid #232a36;
+.add-btn.remove {
+    background: #e53935;
     color: #fff;
-    box-shadow: 0 1px 2px #0002;
-    margin: 0 1px;
-    transition: background 0.2s, border 0.2s;
 }
-.history-chip.B {
-    background: #1976d2;
+.add-btn.remove:hover {
+    background: #b71c1c;
+}
+.add-btn.remove-all {
+    background: #757575;
     color: #fff;
-    border-color: #1976d2;
 }
-.history-chip.P {
-    background: #43a047;
-    color: #fff;
-    border-color: #43a047;
-}
-.history-chip.T {
-    background: #ffd600;
-    color: #232a36;
-    border-color: #ffd600;
+.add-btn.remove-all:hover {
+    background: #424242;
 }
 body {
     background: #181c24;
