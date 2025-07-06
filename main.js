@@ -50,10 +50,10 @@ function updateRoads() {
     // Big Road: 6x24
     const bigRoadGrid = renderBigRoad(history, 6, 24);
     renderRoadGrid(document.getElementById('big-road'), bigRoadGrid);
-    // Big Eye Boy, Small Road, Cockroach Pig: 6x12
-    renderRoadGrid(document.getElementById('big-eye-boy'), renderEmptyRoad(6, 12));
-    renderRoadGrid(document.getElementById('small-road'), renderEmptyRoad(6, 12));
-    renderRoadGrid(document.getElementById('cockroach-pig'), renderEmptyRoad(6, 12));
+    // Big Eye Boy, Small Road, Cockroach Pig: 6x24 (đồng bộ số cột với Big Road)
+    renderRoadGrid(document.getElementById('big-eye-boy'), renderEmptyRoad(6, 24));
+    renderRoadGrid(document.getElementById('small-road'), renderEmptyRoad(6, 24));
+    renderRoadGrid(document.getElementById('cockroach-pig'), renderEmptyRoad(6, 24));
 }
 
 function renderRoadGrid(container, grid) {

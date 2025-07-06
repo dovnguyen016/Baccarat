@@ -154,23 +154,25 @@ button:hover {
 }
 .bead-plate-grid {
     display: grid;
-    grid-template-columns: repeat(6, 28px);
-    grid-auto-rows: 28px;
+    grid-template-columns: repeat(6, 32px);
+    grid-auto-rows: 32px;
     gap: 2px;
     margin-bottom: 8px;
-    min-width: 168px;
-    min-height: 168px;
+    min-width: 192px;
+    min-height: 192px;
     box-shadow: 0 2px 8px #0002;
+    background: #181c24;
 }
 .big-road-grid {
     display: grid;
-    grid-template-columns: repeat(24, 18px);
-    grid-auto-rows: 18px;
+    grid-template-columns: repeat(24, 20px);
+    grid-auto-rows: 20px;
     gap: 1px;
     margin-bottom: 8px;
-    min-height: 108px;
-    min-width: 432px;
+    min-height: 120px;
+    min-width: 480px;
     box-shadow: 0 2px 8px #0002;
+    background: #181c24;
 }
 .sub-roads-row {
     display: flex;
@@ -191,13 +193,14 @@ button:hover {
 }
 .sub-road-grid {
     display: grid;
-    grid-template-columns: repeat(12, 14px);
-    grid-auto-rows: 14px;
+    grid-template-columns: repeat(12, 16px);
+    grid-auto-rows: 16px;
     gap: 1px;
-    min-width: 168px;
-    min-height: 84px;
+    min-width: 192px;
+    min-height: 96px;
     margin-bottom: 2px;
     box-shadow: 0 2px 8px #0002;
+    background: #181c24;
 }
 .road-cell {
     width: 100%;
@@ -205,13 +208,14 @@ button:hover {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 2px;
+    border-radius: 3px;
     font-weight: bold;
-    font-size: 0.95em;
+    font-size: 1.05em;
     background: #232a36;
     border: 1px solid #222;
     box-sizing: border-box;
     transition: background 0.2s;
+    user-select: none;
 }
 .road-cell.blue { color: #2196f3; }
 .road-cell.red { color: #ff5252; }
