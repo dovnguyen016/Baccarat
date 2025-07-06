@@ -11,29 +11,39 @@ const addPlayerBtn = document.getElementById('addPlayer');
 const addTieBtn = document.getElementById('addTie');
 const historyVisual = document.getElementById('history-visual');
 // Add history by button
+let historyArr = [];
+
 if (addBankerBtn && addPlayerBtn && addTieBtn) {
     addBankerBtn.addEventListener('click', () => {
-        historyInput.value += 'B';
-        historyInput.focus();
+        historyArr.push('B');
         updateRoads();
     });
     addPlayerBtn.addEventListener('click', () => {
-        historyInput.value += 'P';
-        historyInput.focus();
+        historyArr.push('P');
         updateRoads();
     });
     addTieBtn.addEventListener('click', () => {
-        historyInput.value += 'T';
-        historyInput.focus();
+        historyArr.push('T');
         updateRoads();
     });
 }
 
-function parseHistory(str) {
-    return str.toUpperCase().replace(/[^BPT]/g, '').split('');
+function updateRoads() {
+    // Sử dụng historyArr thay vì lấy từ input
+    const history = historyArr;
+    // Bead Plate: 6x6
+    const beadGrid = renderBeadPlate(history, 6, 6);
+    renderRoadGrid(document.getElementById('bead-plate'), beadGrid);
+    // Big Road: 6x24
+    const bigRoadGrid = renderBigRoad(history, 6, 24);
+    renderRoadGrid(document.getElementById('big-road'), bigRoadGrid);
+    // Big Eye Boy, Small Road, Cockroach Pig: 6x12
+    renderRoadGrid(document.getElementById('big-eye-boy'), renderEmptyRoad(6, 12));
+    renderRoadGrid(document.getElementById('small-road'), renderEmptyRoad(6, 12));
+    renderRoadGrid(document.getElementById('cockroach-pig'), renderEmptyRoad(6, 12));
+    renderHistoryVisual();
 }
 
-// Render road to grid
 function renderRoadGrid(container, grid) {
     container.innerHTML = '';
     for (let r = 0; r < grid.length; r++) {
@@ -50,23 +60,8 @@ function renderRoadGrid(container, grid) {
     }
 }
 
-function updateRoads() {
-    const history = parseHistory(historyInput.value);
-    // Bead Plate: 6x6
-    const beadGrid = renderBeadPlate(history, 6, 6);
-    renderRoadGrid(document.getElementById('bead-plate'), beadGrid);
-    // Big Road: 6x24
-    const bigRoadGrid = renderBigRoad(history, 6, 24);
-    renderRoadGrid(document.getElementById('big-road'), bigRoadGrid);
-    // Big Eye Boy, Small Road, Cockroach Pig: 6x12
-    renderRoadGrid(document.getElementById('big-eye-boy'), renderEmptyRoad(6, 12));
-    renderRoadGrid(document.getElementById('small-road'), renderEmptyRoad(6, 12));
-    renderRoadGrid(document.getElementById('cockroach-pig'), renderEmptyRoad(6, 12));
-    renderHistoryVisual();
-}
-
 function renderHistoryVisual() {
-    const history = parseHistory(historyInput.value);
+    const history = historyArr;
     historyVisual.innerHTML = '';
     history.forEach(val => {
         const chip = document.createElement('div');
@@ -77,7 +72,7 @@ function renderHistoryVisual() {
 }
 
 predictBtn.addEventListener('click', () => {
-    const history = parseHistory(historyInput.value);
+    const history = historyArr;
     if (history.length === 0) {
         resultDiv.innerHTML = '<span style="color:#ff5252">Vui lòng nhập lịch sử hợp lệ!</span>';
         updateRoads();
@@ -95,10 +90,4 @@ predictBtn.addEventListener('click', () => {
     updateRoads();
 });
 
-// Enter key triggers prediction
-document.getElementById('history').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') predictBtn.click();
-    setTimeout(updateRoads, 10);
-});
-historyInput.addEventListener('input', updateRoads);
 window.addEventListener('DOMContentLoaded', updateRoads);
